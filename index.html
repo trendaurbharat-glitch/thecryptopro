@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Crypto Pro | God-Level Trading Terminal</title>
+    <title>The Crypto Pro | Ultimate Confluence Engine</title>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <style>
         :root {
@@ -12,7 +12,7 @@
             --color-buy: #0ecb81; --color-buy-hover: #0b9e65;
             --color-sell: #f6465d; --color-sell-hover: #c9354a;
             --color-accent: #fcd535; --border-color: #2b3139;
-            --color-warning: #ff9800;
+            --color-warning: #ff9800; --color-smc: #b28dff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent;}
         body { background-color: var(--bg-base); color: var(--text-main); font-size: 13px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; width: 100vw;}
@@ -44,7 +44,7 @@
         .close-all-btn { background: #ff0000; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); transition: 0.2s; font-size: 12px;}
         .close-all-btn:hover { background: #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.6); }
 
-        /* APP VIEWS - FLEX 1 to fill space above nav */
+        /* APP VIEWS */
         .app-view { display: none; flex: 1; overflow: hidden; width: 100%; }
         .app-view.active { display: flex; }
 
@@ -77,17 +77,18 @@
         .momentum-indicator { position: absolute; height: 100%; width: 6px; background: white; border-radius: 2px; left: 50%; transform: translateX(-50%); transition: left 0.2s; box-shadow: 0 0 5px white;}
         #whale-alert { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--color-accent); color: black; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; display: none; box-shadow: 0 0 10px var(--color-accent); white-space: nowrap; z-index: 5;}
 
-        /* AI SCANNER */
-        .ai-scanner { background: rgba(24cd, 213, 53, 0.05); border: 1px solid var(--border-color); border-left: 3px solid var(--color-accent); padding: 12px; border-radius: 6px; margin-bottom: 15px; position: relative;}
-        .ai-title { font-weight: bold; color: var(--color-accent); font-size: 13px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        /* AI SCANNER V20 */
+        .ai-scanner { background: rgba(24cd, 213, 53, 0.05); border: 1px solid var(--border-color); border-left: 3px solid var(--color-buy); padding: 12px; border-radius: 6px; margin-bottom: 15px; position: relative;}
+        .ai-title { font-weight: bold; color: var(--color-buy); font-size: 13px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase;}
         .ai-mode-selector { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--color-accent); padding: 6px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; width: 100%; text-align: center; font-weight: bold; cursor: pointer;}
         .scan-btn { background: var(--color-accent); color: black; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; width: 100%; margin-bottom: 5px; box-shadow: 0 0 8px rgba(252, 213, 53, 0.4); transition: 0.2s; text-transform: uppercase;}
         .scan-btn:hover { background: #eab308; transform: scale(1.02); }
         .ai-result { display: none; font-size: 12px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;}
         .ai-badge { display: inline-block; padding: 8px 10px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; width: 100%; text-align: center; font-size: 14px; letter-spacing: 0.5px;}
         .psychology-msg { font-style: italic; color: #b7c4d1; text-align: center; margin-bottom: 10px; font-size: 11px; background: var(--bg-input); padding: 6px; border-radius: 4px; line-height: 1.4;}
+        
         .ai-data-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--text-muted); font-size: 12px;}
-        .ai-data-row span { color: var(--text-main); font-family: monospace; font-weight: bold; }
+        .ai-data-row span { color: var(--text-main); font-family: monospace; font-weight: bold; text-align: right;}
         .apply-ai-btn { background: transparent; border: 1px solid var(--color-buy); color: var(--color-buy); width: 100%; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.2s; font-size: 13px;}
         .apply-ai-btn:hover { background: var(--color-buy); color: white; }
 
@@ -113,8 +114,8 @@
         .buy-btn { background-color: var(--color-buy); } .buy-btn:hover { background-color: var(--color-buy-hover); transform: translateY(-2px);}
         .sell-btn { background-color: var(--color-sell); } .sell-btn:hover { background-color: var(--color-sell-hover); transform: translateY(-2px);}
 
-        /* ---------------- VIEW 2: POSITIONS ---------------- */
-        #view-positions { flex-direction: column; background: var(--bg-base); padding: 15px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
+        /* ---------------- VIEW 2 & 3: POSITIONS & DASHBOARD ---------------- */
+        #view-positions, #view-dashboard { flex-direction: column; background: var(--bg-base); padding: 15px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
         .pos-page-header { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: white; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;}
         .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 25px;}
         
@@ -146,96 +147,42 @@
         .be-btn { cursor: pointer; font-size: 11px; font-weight: bold; margin-left: 5px; padding: 3px 6px; background: rgba(14,203,129,0.2); color: var(--color-buy); border-radius: 4px; border: 1px solid var(--color-buy); }
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; width: 100%; background: var(--bg-panel); border-radius: 8px; border: 1px dashed var(--border-color);}
 
-        /* ---------------- VIEW 3: DASHBOARD ---------------- */
-        #view-dashboard { flex-direction: column; background: var(--bg-base); padding: 20px; overflow-y: auto; gap: 20px; -webkit-overflow-scrolling: touch;}
         .dash-header { font-size: 22px; font-weight: bold; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
         .reset-btn { background: rgba(246, 70, 93, 0.1); border: 1px solid var(--color-sell); color: var(--color-sell); padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;}
         .reset-btn:hover { background: var(--color-sell); color: white;}
-        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top:20px;}
         .dash-card { background: var(--bg-panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
         .dash-card-title { color: var(--text-muted); font-size: 13px; font-weight: bold; text-transform: uppercase; }
         .dash-card-val { font-size: 28px; font-weight: bold; font-family: monospace; color: white; }
-        .dash-card-sub { font-size: 12px; color: var(--text-muted); }
 
         .disabled-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(11, 14, 17, 0.9); z-index: 50; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; flex-direction: column; backdrop-filter: blur(3px); display: none;}
         .disabled-msg { color: var(--color-warning); font-size: 18px; font-weight: bold; margin-bottom: 10px;}
         #toast { position: fixed; top: 20px; right: 50%; transform: translateX(50%); background: var(--bg-panel); border-left: 5px solid; padding: 15px 20px; border-radius: 6px; color: white; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.7); display: none; z-index: 9999; font-size: 14px; white-space: nowrap;}
 
-        /* 🧠 BOTTOM NAVIGATION BAR (NATIVE APP FEEL) */
+        /* BOTTOM NAVIGATION BAR */
         .app-nav { display: flex; background: var(--bg-panel); border-top: 1px solid var(--border-color); padding: 0; justify-content: space-around; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000;}
         .nav-item { flex: 1; text-align: center; padding: 12px 5px; color: var(--text-muted); font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-bottom: 3px solid transparent;}
         .nav-item:hover { color: var(--text-main); background: var(--bg-input);}
         .nav-item.active { color: var(--color-accent); border-bottom: 3px solid var(--color-accent); background: rgba(252, 213, 53, 0.05);}
-        .nav-icon { font-size: 18px; }
 
-        /* THE MOBILE TOGGLE ARROW */
         .mobile-toggle-btn { display: none; }
         .mobile-close-btn { display: none; }
 
-        /* ================== V18: GOD-LEVEL RESPONSIVE MEDIA QUERIES ================== */
+        /* ================== RESPONSIVE ================== */
         @media (max-width: 900px) {
-            /* Make header smaller */
             .header { padding: 10px; justify-content: center; text-align: center;}
             .logo { font-size: 16px; width: 100%; justify-content: center; margin-bottom: 5px;}
             .stats-panel { width: 100%; justify-content: space-between; }
             .close-all-btn { width: 100%; margin-top: 5px;}
 
-            /* Workspace setup for Slide Drawer */
             #view-terminal { position: relative; overflow: hidden; display: block; }
             .chart-container { width: 100% !important; height: 100% !important; border: none; resize: none; }
             
-            /* 🧠 THE SLIDING DRAWER PANEL */
-            .side-panel { 
-                position: absolute; 
-                right: -100%; /* Hidden by default */
-                top: 0; 
-                width: 85%; 
-                height: 100%; 
-                z-index: 1000; 
-                box-shadow: -5px 0 20px rgba(0,0,0,0.8); 
-                transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            }
+            .side-panel { position: absolute; right: -100%; top: 0; width: 85%; height: 100%; z-index: 1000; box-shadow: -5px 0 20px rgba(0,0,0,0.8); transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
             .side-panel.open { right: 0; }
 
-            /* The Floating Arrow Button */
-            .mobile-toggle-btn {
-                display: flex;
-                position: absolute;
-                right: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                background: var(--color-accent);
-                color: black;
-                padding: 15px 8px;
-                border-radius: 10px 0 0 10px;
-                cursor: pointer;
-                z-index: 900;
-                font-weight: bold;
-                font-size: 16px;
-                box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-                align-items: center;
-                text-align: center;
-                line-height: 1.2;
-            }
-            
-            .mobile-close-btn {
-                display: flex;
-                background: var(--color-sell);
-                color: white;
-                font-weight: bold;
-                padding: 12px;
-                justify-content: center;
-                align-items: center;
-                cursor: pointer;
-                font-size: 14px;
-                flex-shrink: 0;
-            }
-
-            .trade-live-price { font-size: 24px; }
-            .pos-grid { grid-template-columns: 1fr; } 
-            .dash-grid { grid-template-columns: 1fr; }
-            .dash-header { flex-direction: column; align-items: stretch; text-align: center;}
-            .btn { font-size: 14px; padding: 14px;}
+            .mobile-toggle-btn { display: flex; position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: var(--color-buy); color: black; padding: 15px 8px; border-radius: 10px 0 0 10px; cursor: pointer; z-index: 900; font-weight: bold; font-size: 16px; box-shadow: -2px 0 10px rgba(0,0,0,0.5); align-items: center; text-align: center; line-height: 1.2; }
+            .mobile-close-btn { display: flex; background: var(--color-sell); color: white; font-weight: bold; padding: 12px; justify-content: center; align-items: center; cursor: pointer; font-size: 14px; flex-shrink: 0; }
         }
     </style>
 </head>
@@ -245,8 +192,7 @@
 
     <div class="header">
         <div class="logo">
-            ⚡ The Crypto Pro
-            <div class="live-clock" id="clock">00:00:00</div>
+            ⚡ The Crypto Pro <span style="color:#0ecb81; font-size:12px; border:1px solid; padding:2px 4px; border-radius:4px;">Confluence Engine</span>
         </div>
         <div class="stats-panel">
             <div class="stat-box">
@@ -265,10 +211,7 @@
     <div class="tradingview-widget-container" style="background:var(--bg-base); border-bottom:1px solid var(--border-color); flex-shrink: 0;">
         <div class="tradingview-widget-container__widget"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-ticker-tape.js" async>
-        {
-        "symbols": [ {"proName": "BINANCE:BTCUSDT", "title": "Bitcoin"}, {"proName": "BINANCE:ETHUSDT", "title": "Ethereum"}, {"proName": "BINANCE:SOLUSDT", "title": "Solana"}, {"proName": "BINANCE:DOGEUSDT", "title": "Dogecoin"}, {"proName": "BINANCE:XRPUSDT", "title": "Ripple"}, {"proName": "OANDA:XAUUSD", "title": "Gold"}, {"proName": "NSE:NIFTY", "title": "Nifty 50"} ],
-        "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "adaptive", "locale": "en"
-        }
+        { "symbols": [ {"proName": "BINANCE:BTCUSDT", "title": "Bitcoin"}, {"proName": "BINANCE:ETHUSDT", "title": "Ethereum"}, {"proName": "BINANCE:SOLUSDT", "title": "Solana"}, {"proName": "BINANCE:DOGEUSDT", "title": "Dogecoin"}, {"proName": "BINANCE:XRPUSDT", "title": "Ripple"}, {"proName": "OANDA:XAUUSD", "title": "Gold"}, {"proName": "NSE:NIFTY", "title": "Nifty 50"} ], "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "adaptive", "locale": "en" }
         </script>
     </div>
 
@@ -285,7 +228,6 @@
         </div>
 
         <div class="side-panel" id="side-panel-drawer">
-            
             <div class="mobile-close-btn" onclick="toggleDrawer()">❌ Close Panel</div>
 
             <div class="asset-selector-header">
@@ -311,26 +253,28 @@
                 </div>
 
                 <div class="ai-scanner">
-                    <div class="ai-title">🧠 Deep Price Action Engine</div>
+                    <div class="ai-title">🔥 AI Confluence Engine v20</div>
                     <select id="scalp-mode" class="ai-mode-selector">
-                        <option value="1m_quick">⚡ 1m Sniper (Quick Entry, Tight SL)</option>
-                        <option value="5m_standard" selected>⚖️ 5m Standard (Balanced RR)</option>
-                        <option value="15m_patient">🧘‍♂️ 15m Patient (Big Swings)</option>
+                        <option value="1m_quick">⚡ Quick Scalp (Tight Risk, 1:1.5 RR)</option>
+                        <option value="5m_standard" selected>⚖️ Standard Scalp (1:2 RR)</option>
+                        <option value="15m_patient">🧘‍♂️ Patient Swing (1:3 RR)</option>
                     </select>
-                    <button class="scan-btn" onclick="runAIScan()" id="scan-btn">🔍 DEEP SCAN CHART</button>
+                    <button class="scan-btn" onclick="runAIScan()" id="scan-btn">🔍 DEEP CONFLUENCE SCAN</button>
                     
                     <div class="ai-result" id="ai-result">
                         <div id="ai-badge" class="ai-badge">Analyzing...</div>
                         <div id="psychology-msg" class="psychology-msg">Wait for the perfect setup...</div>
-                        <div class="ai-data-row">Order Pressure: <span id="ai-pressure">-</span></div>
-                        <div class="ai-data-row">Big Bar / Momentum: <span id="ai-bigbar">-</span></div>
-                        <div class="ai-data-row">Market State: <span id="ai-range">-</span></div>
-                        <div class="ai-data-row">Major S/R Zones: <span id="ai-zones">-</span></div>
-                        <div class="ai-data-row">Candle Pattern: <span id="ai-pattern" style="color:var(--color-accent);">-</span></div>
-                        <br>
-                        <div class="ai-data-row" style="color:var(--color-buy)">Calculated TP: <span id="ai-tp-val">-</span></div>
-                        <div class="ai-data-row" style="color:var(--color-sell)">Smart SL: <span id="ai-sl-val">-</span></div>
-                        <button class="apply-ai-btn" id="apply-ai-btn" onclick="applyAITargets()">✨ Apply Strategy Targets</button>
+                        
+                        <div style="border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; margin-bottom: 8px;">
+                            <div class="ai-data-row">Price Action: <span id="ai-pa">-</span></div>
+                            <div class="ai-data-row">Order Flow: <span id="ai-flow">-</span></div>
+                            <div class="ai-data-row">Smart Money: <span id="ai-smc" style="color:var(--color-smc)">-</span></div>
+                            <div class="ai-data-row">Market State: <span id="ai-state">-</span></div>
+                        </div>
+
+                        <div class="ai-data-row" style="color:var(--color-buy)">Target (TP): <span id="ai-tp-val">-</span></div>
+                        <div class="ai-data-row" style="color:var(--color-sell)">Tight SL: <span id="ai-sl-val">-</span></div>
+                        <button class="apply-ai-btn" id="apply-ai-btn" onclick="applyAITargets()">✨ Apply Strict Targets</button>
                     </div>
                 </div>
                 
@@ -384,7 +328,6 @@
     <div id="view-positions" class="app-view">
         <div class="pos-page-header" style="color:var(--color-buy);">🟢 Active Open Positions (<span id="page-count-active">0</span>)</div>
         <div class="pos-grid" id="page-tab-active"></div>
-        
         <div class="pos-page-header" style="color:var(--text-muted); margin-top:20px;">📜 Closed Trade History</div>
         <div class="pos-grid" id="page-tab-history"></div>
     </div>
@@ -394,43 +337,35 @@
             <span>📊 Portfolio Analytics</span>
             <button class="reset-btn" onclick="resetAccount()">⚠ Reset Account to $10k</button>
         </div>
-
         <div class="dash-grid">
             <div class="dash-card">
                 <div class="dash-card-title">Win Rate (Accuracy)</div>
                 <div class="dash-card-val" id="dash-winrate" style="color:var(--color-accent);">0.0%</div>
-                <div class="dash-card-sub">Based on closed trades</div>
             </div>
             <div class="dash-card">
                 <div class="dash-card-title">Gross Realized PnL</div>
                 <div class="dash-card-val" id="dash-gross-pnl">$0.00</div>
-                <div class="dash-card-sub">Total profit/loss booked</div>
             </div>
             <div class="dash-card">
                 <div class="dash-card-title">Total Trades Taken</div>
                 <div class="dash-card-val" id="dash-total-trades">0</div>
-                <div class="dash-card-sub">Since account start</div>
             </div>
             <div class="dash-card">
                 <div class="dash-card-title">Best Winning Trade</div>
                 <div class="dash-card-val green" id="dash-best-trade">$0.00</div>
-                <div class="dash-card-sub">Highest profit in one trade</div>
             </div>
         </div>
     </div>
 
     <div class="app-nav">
         <div class="nav-item active" onclick="switchAppView('terminal')" id="nav-terminal">
-            <div class="nav-icon">📈</div>
-            Terminal
+            <div class="nav-icon">📈</div>Terminal
         </div>
         <div class="nav-item" onclick="switchAppView('positions')" id="nav-positions">
-            <div class="nav-icon">💼</div>
-            Positions
+            <div class="nav-icon">💼</div>Positions
         </div>
         <div class="nav-item" onclick="switchAppView('dashboard')" id="nav-dashboard">
-            <div class="nav-icon">🏠</div>
-            Dashboard
+            <div class="nav-icon">🏠</div>Dashboard
         </div>
     </div>
 
@@ -458,50 +393,38 @@
             { id: "RELIANCE", name: "Reliance Ind", tv: "NSE:RELIANCE", isCrypto: false }
         ];
 
-        // --- 🧠 V18: MOBILE DRAWER TOGGLE LOGIC ---
         function toggleDrawer() {
             let drawer = document.getElementById('side-panel-drawer');
             let toggleBtn = document.getElementById('mobile-toggle-btn');
             if(drawer.classList.contains('open')) {
-                drawer.classList.remove('open');
-                toggleBtn.style.display = 'flex'; // Show arrow when closed
+                drawer.classList.remove('open'); toggleBtn.style.display = 'flex'; 
             } else {
-                drawer.classList.add('open');
-                toggleBtn.style.display = 'none'; // Hide arrow when panel is open
+                drawer.classList.add('open'); toggleBtn.style.display = 'none'; 
             }
         }
 
-        // --- View Navigation ---
         function switchAppView(viewName) {
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`view-${viewName}`).classList.add('active');
             document.getElementById(`nav-${viewName}`).classList.add('active');
             
-            // Auto-close drawer if leaving terminal
             let drawer = document.getElementById('side-panel-drawer');
-            if(drawer.classList.contains('open')) toggleDrawer();
-
+            if(drawer.classList.contains('open') && viewName !== 'terminal') toggleDrawer();
             if(viewName === 'dashboard') updateDashboardStats();
             if(viewName === 'positions') updateUI(); 
         }
 
         document.addEventListener('click', (e) => {
-            if(!e.target.closest('.search-wrapper')) {
-                let s = document.getElementById('search-list');
-                if(s) s.style.display = 'none';
-            }
+            if(!e.target.closest('.search-wrapper')) { let s = document.getElementById('search-list'); if(s) s.style.display = 'none'; }
         });
 
-        // --- Fetch & Search ---
         async function fetchAllCryptoPairs() {
             try {
                 let res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
                 let data = await res.json();
                 let usdtPairs = data.filter(d => d.symbol.endsWith('USDT')).sort((a,b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume)).slice(0, 150);
-                
                 let select = document.getElementById('asset-select'); select.innerHTML = '';
-                
                 usdtPairs.forEach(p => {
                     let friendlyName = nameMap[p.symbol] || p.symbol.replace('USDT', '');
                     let isTop = ['BTC','ETH','SOL','BNB','DOGE'].includes(p.symbol.replace('USDT',''));
@@ -511,8 +434,7 @@
                     opt.innerText = isTop ? `🔥 ${friendlyName} / USDT` : `${friendlyName} / USDT`;
                     select.appendChild(opt);
                 });
-                select.value = currentAsset;
-                initTradingView(); 
+                select.value = currentAsset; initTradingView(); 
             } catch(e) { showToast("Network Error: Using cached assets.", "warning"); initTradingView(); }
         }
 
@@ -541,8 +463,6 @@
             
             document.getElementById('non-crypto-overlay').style.display = isCrypto ? 'none' : 'flex';
             initTradingView(asset.tv); syncSizeFromMargin(); whalePreviousPrice = 0; 
-            
-            // Auto close drawer on mobile after selection for better UX
             if(window.innerWidth <= 900) toggleDrawer();
         }
 
@@ -554,11 +474,9 @@
             document.getElementById('non-crypto-overlay').style.display = 'none';
             initTradingView(select.options[select.selectedIndex].getAttribute('data-tv')); 
             syncSizeFromMargin(); whalePreviousPrice = 0;
-
             if(window.innerWidth <= 900) toggleDrawer();
         }
 
-        // --- TV Chart ---
         function initTradingView(symbolOverride = null) {
             let tvSymbol = symbolOverride || `BINANCE:${currentAsset}`;
             document.getElementById('chart-title-display').innerText = currentAsset;
@@ -601,10 +519,9 @@
         function openChartInNewTab() {
             let tvSymbol = isCrypto ? `BINANCE:${currentAsset}` : allAssetsList.find(a=>a.id===currentAsset).tv;
             let newTab = window.open("", "_blank");
-            newTab.document.write(`<html><head><title>${currentAsset} Full Chart</title><style>body{margin:0;background:#0b0e11;display:flex;flex-direction:column;height:100vh;color:white;}.sync-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#181a20;border-bottom:1px solid #2b3139;font-family:sans-serif;}.close-btn{background:#ff0000;color:white;border:none;padding:8px 15px;border-radius:4px;font-weight:bold;cursor:pointer;}</style></head><body><div class="sync-bar"><div style="color:#fcd535;font-size:18px;font-weight:900;">⚡ Fullscreen Chart</div><button class="close-btn" onclick="localStorage.setItem('v6CloseAllTrigger', Date.now().toString());">⚠ CLOSE ALL</button></div><div id="tv_popup_container" style="flex:1;width:100%;"></div><script type="text/javascript" src="https://s3.tradingview.com/tv.js"><\/script><script>new TradingView.widget({"autosize":true,"symbol":"${tvSymbol}","interval":"5","theme":"dark","style":"1","backgroundColor":"#181a20","gridColor":"#2b3139","container_id":"tv_popup_container","hide_side_toolbar":false});<\/script></body></html>`);
+            newTab.document.write(`<html><head><title>${currentAsset}</title><style>body{margin:0;background:#0b0e11;display:flex;flex-direction:column;height:100vh;}</style></head><body><div id="tv_popup_container" style="flex:1;width:100%;"></div><script type="text/javascript" src="https://s3.tradingview.com/tv.js"><\/script><script>new TradingView.widget({"autosize":true,"symbol":"${tvSymbol}","interval":"5","theme":"dark","style":"1","backgroundColor":"#181a20","gridColor":"#2b3139","container_id":"tv_popup_container","hide_side_toolbar":false});<\/script></body></html>`);
         }
 
-        // --- Audio & Flash ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSound(type) {
             if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -620,7 +537,6 @@
             void body.offsetWidth; body.classList.add(isProfit ? 'flash-profit' : 'flash-loss');
         }
 
-        // --- Websocket Live ---
         const ws = new WebSocket("wss://stream.binance.com:9443/ws/!miniTicker@arr");
         ws.onmessage = (e) => {
             let data = JSON.parse(e.data);
@@ -654,7 +570,6 @@
             });
         };
 
-        // --- Inputs & Risk Calc ---
         function updateLev() { document.getElementById('lev-val').innerText = document.getElementById('leverage').value + 'x'; syncSizeFromMargin(); calculateRiskReward(); }
         function syncSizeFromMargin() {
             if(!isCrypto) return;
@@ -682,7 +597,6 @@
             if(qty && cp && (tp || sl)) {
                 let riskAmt = sl ? Math.abs((cp - sl) * qty) : 0;
                 let rewardAmt = tp ? Math.abs((tp - cp) * qty) : 0;
-                
                 document.getElementById('calc-profit').innerText = tp ? `+$${rewardAmt.toFixed(2)}` : '--';
                 document.getElementById('calc-loss').innerText = sl ? `-$${riskAmt.toFixed(2)}` : '--';
                 document.getElementById('calc-rr').innerText = (tp && sl && riskAmt>0) ? `1 : ${(rewardAmt/riskAmt).toFixed(1)}` : '--';
@@ -690,11 +604,12 @@
             } else { calcBox.style.display = "none"; }
         }
 
-        // --- Deep AI Scanner ---
+        // --- 🧠 V20: THE ULTIMATE CONFLUENCE & TIGHT SL ENGINE ---
         async function runAIScan() {
             if (!isCrypto) { return showToast("Scanner optimized for Crypto only.", "warning"); }
             let btn = document.getElementById('scan-btn'); let resBox = document.getElementById('ai-result'); let cp = allLivePrices[currentAsset];
-            let tf = document.getElementById('scalp-mode').value.split('_')[0]; 
+            let scalpMode = document.getElementById('scalp-mode').value;
+            let tf = scalpMode.split('_')[0]; 
             if(!cp) return showToast("Live price not ready!", "error");
             btn.innerText = "⏳ DEEP SCANNING..."; btn.disabled = true;
             
@@ -704,57 +619,94 @@
                 let opens = data.map(d=>parseFloat(d[1])); let highs = data.map(d=>parseFloat(d[2]));
                 let lows = data.map(d=>parseFloat(d[3])); let closes = data.map(d=>parseFloat(d[4])); let volumes = data.map(d=>parseFloat(d[5]));
 
+                let dec = cp<0.1?6:cp<10?4:2;
                 let trArr = []; for(let i=closes.length-15; i<closes.length; i++) trArr.push(Math.max(highs[i]-lows[i], Math.abs(highs[i]-closes[i-1]), Math.abs(lows[i]-closes[i-1])));
                 let atr = trArr.reduce((a,b)=>a+b)/trArr.length;
                 let resistance = Math.max(...highs.slice(-50)); let support = Math.min(...lows.slice(-50));
                 
-                let buyVol = 0; let sellVol = 0;
-                for(let i=closes.length-15; i<closes.length; i++) { if(closes[i]>=opens[i]) buyVol+=volumes[i]; else sellVol+=volumes[i]; }
-                
-                let lastBody = Math.abs(closes[closes.length-2] - opens[opens.length-2]);
-                let isBullishBigBar = closes[closes.length-2]>opens[opens.length-2] && lastBody>(atr*1.8);
-                let isBearishBigBar = closes[closes.length-2]<opens[opens.length-2] && lastBody>(atr*1.8);
-
-                let isConsolidating = (Math.max(...highs.slice(-10,-1)) - Math.min(...lows.slice(-10,-1))) < (atr*2.5);
-                
+                // 1. Candlestick PA
                 let lastOpen = opens[opens.length-2]; let lastClose = closes[closes.length-2];
                 let upperWick = highs[highs.length-2] - Math.max(lastOpen, lastClose); let lowerWick = Math.min(lastOpen, lastClose) - lows[lows.length-2];
                 let body = Math.abs(lastClose - lastOpen);
-
-                let pattern = "Inside / Choppy"; let isBullPattern=false; let isBearPattern=false;
-                if(closes[closes.length-2]>opens[opens.length-3] && opens[opens.length-2]<closes[closes.length-3] && opens[opens.length-3]>closes[closes.length-3]) { pattern = "Bullish Engulfing 🟢"; isBullPattern = true; } 
-                else if(closes[closes.length-2]<opens[opens.length-3] && opens[opens.length-2]>closes[closes.length-3] && opens[opens.length-3]<closes[closes.length-3]) { pattern = "Bearish Engulfing 🔴"; isBearPattern = true; } 
-                else if(lowerWick>body*2 && upperWick<body) { pattern = "Bullish Pin Bar 🔨"; isBullPattern = true; } 
-                else if(upperWick>body*2 && lowerWick<body) { pattern = "Bearish Pin Bar ☄️"; isBearPattern = true; }
-
-                let score = 0;
-                if((cp-support)<=(atr*1.5)) score+=2; if((resistance-cp)<=(atr*1.5)) score-=2;
-                if(buyVol>(sellVol*1.3)) score+=2; if(sellVol>(buyVol*1.3)) score-=2;
-                if(isBullPattern) score+=2; if(isBearPattern) score-=2;
-                if(isBullishBigBar) score+=3; if(isBearishBigBar) score-=3;
-
-                let signal = "NO TRADE ZONE 🚫"; let color = "var(--text-main)"; let bg = "var(--bg-input)";
-                let psychoMsg = "Market choppy hai. Wait karo.";
-                aiCalculatedTP = null; aiCalculatedSL = null; let dec = cp<0.1?6:cp<10?4:2;
+                let paText = "Neutral / Choppy"; let isBullPA=false; let isBearPA=false;
                 
-                let mode = document.getElementById('scalp-mode').value;
-                let rrMulti = mode==='1m_quick'?1.5 : mode==='5m_standard'?2 : 3;
-                let slMulti = mode==='1m_quick'?1 : mode==='5m_standard'?1.5 : 2;
+                if(closes[closes.length-2]>opens[opens.length-3] && opens[opens.length-2]<closes[closes.length-3]) { paText = "Bullish Engulfing 🟢"; isBullPA = true; } 
+                else if(closes[closes.length-2]<opens[opens.length-3] && opens[opens.length-2]>closes[closes.length-3]) { paText = "Bearish Engulfing 🔴"; isBearPA = true; } 
+                else if(lowerWick>body*2 && upperWick<body) { paText = "Bullish Pin Bar 🔨"; isBullPA = true; } 
+                else if(upperWick>body*2 && lowerWick<body) { paText = "Bearish Pin Bar ☄️"; isBearPA = true; }
 
-                if(isConsolidating && score>-3 && score<3) { signal="CONSOLIDATION ⚠️"; color="var(--color-warning)"; bg="rgba(255,152,0,0.1)"; psychoMsg="Range me fasa hai. Breakout ka wait karo."; } 
-                else if(score>=5) { signal=`STRONG BUY 🟢 [${tf}]`; color="#000"; bg="var(--color-buy)"; psychoMsg="High Accuracy Setup: Buyers Control. Go Long!"; aiCalculatedSL=cp-(atr*slMulti); aiCalculatedTP=cp+(atr*rrMulti); }
-                else if(score<=-5) { signal=`STRONG SELL 🔴 [${tf}]`; color="#FFF"; bg="var(--color-sell)"; psychoMsg="Institutional Selling. Short it!"; aiCalculatedSL=cp+(atr*slMulti); aiCalculatedTP=cp-(atr*rrMulti); }
-                else if(score>=2) { signal=`SCALP BUY ↗️ [${tf}]`; color="#000"; bg="var(--color-buy)"; psychoMsg="Slight Bullish Edge. Quick scalp."; aiCalculatedSL=cp-(atr*0.8); aiCalculatedTP=cp+(atr*1); }
-                else if(score<=-2) { signal=`SCALP SELL ↘️ [${tf}]`; color="#FFF"; bg="var(--color-sell)"; psychoMsg="Slight Bearish Edge. Quick short."; aiCalculatedSL=cp+(atr*0.8); aiCalculatedTP=cp-(atr*1); }
+                // 2. Order Flow & Big Bars
+                let buyVol = 0; let sellVol = 0;
+                for(let i=closes.length-15; i<closes.length; i++) { if(closes[i]>=opens[i]) buyVol+=volumes[i]; else sellVol+=volumes[i]; }
+                let isBullishBigBar = lastClose>lastOpen && body>(atr*1.5);
+                let isBearishBigBar = lastClose<lastOpen && body>(atr*1.5);
+                let flowText = (buyVol>(sellVol*1.2) || isBullishBigBar) ? "Strong Buying / Breakout 🚀" : (sellVol>(buyVol*1.2) || isBearishBigBar) ? "Strong Selling / Dump 🩸" : "Balanced Volume ➖";
 
-                let badge = document.getElementById('ai-badge');
-                badge.innerText = signal; badge.style.background = bg; badge.style.color = color; badge.style.border = `1px solid ${color}`;
+                // 3. SMC (FVG & Sweeps)
+                let isBullishSMC = false; let isBearishSMC = false; let smcText = "No Imbalance ➖";
+                for(let i = closes.length - 5; i < closes.length - 1; i++) {
+                    if (lows[i] > highs[i-2] && closes[i-1] > opens[i-1]) { isBullishSMC = true; smcText = `Bullish FVG [${highs[i-2].toFixed(dec)} - ${lows[i].toFixed(dec)}]`; }
+                    if (highs[i] < lows[i-2] && closes[i-1] < opens[i-1]) { isBearishSMC = true; smcText = `Bearish FVG [${highs[i].toFixed(dec)} - ${lows[i-2].toFixed(dec)}]`; }
+                }
+                if (lows[lows.length-2] <= support && closes[closes.length-2] > support) { isBullishSMC = true; smcText = "Bullish Stop Hunt (Sweep) 🧹"; }
+                if (highs[highs.length-2] >= resistance && closes[closes.length-2] < resistance) { isBearishSMC = true; smcText = "Bearish Stop Hunt (Sweep) 🧹"; }
+
+                // 4. Market State
+                let isConsolidating = (Math.max(...highs.slice(-10,-1)) - Math.min(...lows.slice(-10,-1))) < (atr*2.5);
+                let stateText = isConsolidating ? "Trapped in Range 📦" : "Trending 🌊";
+
+                // SCORING
+                let score = 0;
+                if(isBullPA) score+=2; if(isBearPA) score-=2;
+                if(buyVol>(sellVol*1.2)) score+=2; if(sellVol>(buyVol*1.2)) score-=2;
+                if(isBullishBigBar) score+=2; if(isBearishBigBar) score-=2;
+                if(isBullishSMC) score+=3; if(isBearishSMC) score-=3;
+
+                let signal = "WAIT FOR SETUP 🚫"; let color = "var(--text-main)"; let bg = "var(--bg-input)";
+                let psychoMsg = "All factors are mixed. Do not force a trade.";
+                aiCalculatedTP = null; aiCalculatedSL = null;
+                
+                // 🧠 V20: TIGHT SL & STRICT RR LOGIC
+                let rrMulti = scalpMode === '1m_quick' ? 1.5 : scalpMode === '5m_standard' ? 2 : 3;
+                let buffer = atr * 0.2; // Tiny buffer for SL
+
+                if (isConsolidating && score > -4 && score < 4) {
+                    signal = "CONSOLIDATION ⚠️"; color = "var(--color-warning)"; bg = "rgba(255,152,0,0.1)"; 
+                    psychoMsg = "Market is building liquidity. Wait for a breakout or sweep.";
+                } 
+                else if (score >= 4) {
+                    signal = `CONFLUENCE BUY 🟢 [${tf}]`; color = "#000"; bg = "var(--color-buy)"; 
+                    psychoMsg = "High Accuracy! PA, Volume, and SMC are Bullish. Take Long."; 
+                    // TIGHT SL: Below the recent 2 candles low
+                    let immediateLow = Math.min(lows[lows.length-2], lows[lows.length-3]);
+                    let rawSL = immediateLow - buffer;
+                    // Cap SL if it's too far (max 1.5 ATR for safety)
+                    aiCalculatedSL = (cp - rawSL > atr * 1.5) ? cp - (atr * 1.5) : rawSL;
+                    let risk = cp - aiCalculatedSL;
+                    aiCalculatedTP = cp + (risk * rrMulti); 
+                }
+                else if (score <= -4) {
+                    signal = `CONFLUENCE SELL 🔴 [${tf}]`; color = "#FFF"; bg = "var(--color-sell)"; 
+                    psychoMsg = "High Accuracy! PA, Volume, and SMC are Bearish. Take Short."; 
+                    // TIGHT SL: Above the recent 2 candles high
+                    let immediateHigh = Math.max(highs[highs.length-2], highs[highs.length-3]);
+                    let rawSL = immediateHigh + buffer;
+                    aiCalculatedSL = (rawSL - cp > atr * 1.5) ? cp + (atr * 1.5) : rawSL;
+                    let risk = aiCalculatedSL - cp;
+                    aiCalculatedTP = cp - (risk * rrMulti); 
+                }
+
+                // Update UI Data
+                document.getElementById('ai-badge').innerText = signal; 
+                document.getElementById('ai-badge').style.background = bg; 
+                document.getElementById('ai-badge').style.color = color; 
+                document.getElementById('ai-badge').style.border = `1px solid ${color}`;
                 document.getElementById('psychology-msg').innerText = psychoMsg;
-                document.getElementById('ai-pressure').innerText = buyVol>(sellVol*1.3) ? "Buyers 🟩" : sellVol>(buyVol*1.3) ? "Sellers 🟥" : "Equal ➖";
-                document.getElementById('ai-bigbar').innerText = isBullishBigBar ? "Bull Breakout 🚀" : isBearishBigBar ? "Bear Dump 🩸" : "Normal";
-                document.getElementById('ai-range').innerText = isConsolidating ? "Trapped 📦" : "Trending 🌊";
-                document.getElementById('ai-zones').innerText = `R: ${resistance.toFixed(dec)} | S: ${support.toFixed(dec)}`;
-                document.getElementById('ai-pattern').innerText = pattern;
+                
+                document.getElementById('ai-pa').innerText = paText;
+                document.getElementById('ai-flow').innerText = flowText;
+                document.getElementById('ai-smc').innerText = smcText;
+                document.getElementById('ai-state').innerText = `${stateText} | R:${resistance.toFixed(dec)} S:${support.toFixed(dec)}`;
                 
                 if (aiCalculatedTP && aiCalculatedSL) {
                     document.getElementById('ai-tp-val').innerText = aiCalculatedTP.toFixed(dec);
@@ -763,8 +715,8 @@
                 } else { document.getElementById('apply-ai-btn').style.display = "none"; }
                 resBox.style.display = 'block';
 
-            } catch(e) { showToast("Scan Error", "error"); }
-            btn.innerText = "🔍 DEEP SCAN CHART"; btn.disabled = false;
+            } catch(e) { showToast("API Limit / Network Error.", "error"); }
+            btn.innerText = "🔍 DEEP CONFLUENCE SCAN"; btn.disabled = false;
         }
 
         function applyAITargets() {
@@ -772,15 +724,13 @@
             let dec = allLivePrices[currentAsset]<0.1 ? 6 : allLivePrices[currentAsset]<10 ? 4 : 2;
             document.getElementById('tp-price').value = aiCalculatedTP.toFixed(dec);
             document.getElementById('sl-price').value = aiCalculatedSL.toFixed(dec);
-            calculateRiskReward(); showToast("AI Targets Applied!", "success");
-            
-            // Auto close drawer on mobile so user can see chart with targets
+            calculateRiskReward(); showToast(`Strict ${document.getElementById('scalp-mode').options[document.getElementById('scalp-mode').selectedIndex].text.split('(')[1].replace(')','')} Applied!`, "success");
             if(window.innerWidth <= 900) toggleDrawer();
         }
 
-        // --- Trading Execution ---
+        // --- Trade Execute ---
         function placeOrder(direction) {
-            if(!isCrypto) return showToast("Live Trading disabled for Non-Crypto.", "error");
+            if(!isCrypto) return showToast("Trading disabled for Non-Crypto.", "error");
             let margin = parseFloat(document.getElementById('margin-amount').value);
             let qty = parseFloat(document.getElementById('qty-amount').value);
             let lev = parseFloat(document.getElementById('leverage').value);
@@ -798,8 +748,6 @@
             document.getElementById('margin-amount').value = ''; document.getElementById('qty-amount').value = ''; 
             document.getElementById('tp-price').value = ''; document.getElementById('sl-price').value = '';
             document.getElementById('risk-calculator').style.display = "none";
-
-            // Redirect to positions tab automatically to see the trade
             switchAppView('positions');
         }
 
@@ -958,8 +906,7 @@
         function resetAccount() {
             if(confirm("⚠ WARNING: Yeh tumhari saari history aur active trades delete kar dega aur account ko wapas $10,000 pe set kar dega. Kya tum sure ho?")) {
                 balance = 10000.00; positions = []; historyData = [];
-                saveData(); updateUI(); updateDashboardStats();
-                showToast("Account Reset Successfully!", "success");
+                saveData(); updateUI(); updateDashboardStats(); showToast("Account Reset Successfully!", "success");
             }
         }
 
