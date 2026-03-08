@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Crypto Pro | God-Level Trading Terminal</title>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <style>
@@ -14,13 +14,13 @@
             --color-accent: #fcd535; --border-color: #2b3139;
             --color-warning: #ff9800;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-main); font-size: 13px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent;}
+        body { background-color: var(--bg-base); color: var(--text-main); font-size: 13px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; width: 100vw;}
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-base); }
-        ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 3px; }
+        /* Custom Sleek Scrollbar */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
 
         .flash-profit { animation: flashGreen 0.6s ease-out; }
@@ -30,148 +30,174 @@
         @keyframes whalePulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
 
         /* HEADER & GLOBAL STATS */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); flex-shrink: 0; flex-wrap: wrap; gap: 10px;}
-        .logo { color: var(--color-accent); font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px;}
-        .live-clock { font-family: monospace; font-size: 14px; color: var(--text-muted); background: var(--bg-input); padding: 4px 10px; border-radius: 4px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); flex-shrink: 0; flex-wrap: wrap; gap: 10px;}
+        .logo { color: var(--color-accent); font-size: 18px; font-weight: 900; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;}
+        .live-clock { font-family: monospace; font-size: 12px; color: var(--text-muted); background: var(--bg-input); padding: 4px 8px; border-radius: 4px; }
         
-        .stats-panel { display: flex; gap: 30px; flex-wrap: wrap;}
+        .stats-panel { display: flex; gap: 20px; flex-wrap: wrap; align-items: center;}
         .stat-box { display: flex; flex-direction: column; justify-content: center; }
-        .stat-title { color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; }
-        .stat-value { font-size: 18px; font-weight: bold; font-family: monospace; display: flex; align-items: center; gap: 8px;}
-        .roi-badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--bg-input); }
+        .stat-title { color: var(--text-muted); font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; }
+        .stat-value { font-size: 16px; font-weight: bold; font-family: monospace; display: flex; align-items: center; gap: 6px;}
+        .roi-badge { font-size: 10px; padding: 2px 4px; border-radius: 4px; background: var(--bg-input); }
         .green { color: var(--color-buy) !important; } .red { color: var(--color-sell) !important; }
         .margin-bar-bg { width: 100%; height: 4px; background: var(--bg-input); border-radius: 2px; margin-top: 5px; overflow: hidden; }
         .margin-bar-fill { height: 100%; width: 0%; background: var(--color-accent); transition: width 0.3s; }
-        .close-all-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); transition: 0.2s;}
+        .close-all-btn { background: #ff0000; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); transition: 0.2s; font-size: 12px;}
         .close-all-btn:hover { background: #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.6); }
 
-        /* 🧠 APP NAVIGATION BAR */
-        .app-nav { display: flex; background: var(--bg-base); border-bottom: 1px solid var(--border-color); padding: 0 20px; gap: 20px; flex-shrink: 0;}
-        .nav-item { padding: 12px 10px; color: var(--text-muted); font-weight: bold; font-size: 14px; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; display: flex; align-items: center; gap: 8px;}
+        /* APP NAVIGATION BAR */
+        .app-nav { display: flex; background: var(--bg-base); border-bottom: 1px solid var(--border-color); padding: 0 15px; gap: 15px; flex-shrink: 0; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;}
+        .nav-item { padding: 12px 5px; color: var(--text-muted); font-weight: bold; font-size: 13px; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .nav-item:hover { color: var(--text-main); }
-        .nav-item.active { color: var(--color-accent); border-bottom: 3px solid var(--color-accent); }
+        .nav-item.active { color: var(--color-accent); border-bottom: 3px solid var(--color-accent); color: white;}
 
         /* APP VIEWS */
-        .app-view { display: none; flex: 1; overflow: hidden; }
+        .app-view { display: none; flex: 1; overflow: hidden; width: 100%; }
         .app-view.active { display: flex; }
 
-        /* ---------------- VIEW 1: TERMINAL ---------------- */
+        /* ---------------- VIEW 1: TERMINAL (Responsive Flex) ---------------- */
         #view-terminal { flex-direction: row; }
-        .chart-container { display: flex; flex-direction: column; background: var(--bg-panel); border-right: 1px solid var(--border-color); resize: horizontal; overflow: hidden; min-width: 40%; width: 65%; position: relative;}
+        .chart-container { display: flex; flex-direction: column; background: var(--bg-panel); border-right: 1px solid var(--border-color); resize: horizontal; overflow: hidden; min-width: 300px; width: 65%; position: relative;}
         .chart-container::-webkit-resizer { background: var(--color-accent); }
-        .chart-header { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid var(--border-color); align-items: center; background: var(--bg-panel); }
-        .chart-title { font-size: 18px; font-weight: bold; color: var(--color-accent); font-family: monospace; letter-spacing: 1px; }
+        .chart-header { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid var(--border-color); align-items: center; background: var(--bg-panel); flex-shrink: 0;}
+        .chart-title { font-size: 16px; font-weight: bold; color: var(--color-accent); font-family: monospace; letter-spacing: 1px; }
         .popout-btn { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); padding: 4px 10px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; font-size: 11px;}
         .popout-btn:hover { background: var(--color-accent); color: black; border-color: var(--color-accent); }
         #tv_chart_container { flex: 1; width: 100%; height: 100%; }
 
-        .side-panel { flex: 1; display: flex; flex-direction: column; min-width: 320px; background: var(--bg-base); overflow: hidden; }
+        .side-panel { flex: 1; display: flex; flex-direction: column; min-width: 300px; background: var(--bg-base); overflow: hidden; }
         
-        .asset-selector-header { padding: 10px 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); z-index: 10; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);}
+        .asset-selector-header { padding: 10px 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); z-index: 10; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); flex-shrink: 0;}
         .search-wrapper { position: relative; }
-        .search-input { width: 100%; background: var(--bg-base); color: white; border: 1px solid var(--color-accent); padding: 8px 12px; border-radius: 4px; font-weight: bold; outline: none; font-size: 13px; transition: border 0.3s;}
+        .search-input { width: 100%; background: var(--bg-base); color: white; border: 1px solid var(--color-accent); padding: 10px 12px; border-radius: 6px; font-weight: bold; outline: none; font-size: 14px; transition: border 0.3s;}
         .search-input:focus { border-color: white; box-shadow: 0 0 5px rgba(255,255,255,0.2); }
-        .search-list { position: absolute; top: 100%; left: 0; width: 100%; background: var(--bg-input); border: 1px solid var(--color-accent); border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-        .search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;}
+        .search-list { position: absolute; top: 100%; left: 0; width: 100%; background: var(--bg-input); border: 1px solid var(--color-accent); border-radius: 0 0 6px 6px; max-height: 250px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .search-item { padding: 12px; cursor: pointer; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; font-size: 13px;}
         .search-item:hover { background: var(--bg-panel); color: var(--color-accent); }
-        select { background: var(--bg-input); color: white; border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 4px; font-weight: bold; outline: none; font-size: 13px; width: 100%; cursor: pointer;}
+        select { background: var(--bg-input); color: white; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-weight: bold; outline: none; font-size: 14px; width: 100%; cursor: pointer;}
         
-        .trade-container { flex: 1; overflow-y: auto; padding: 15px; position: relative; }
+        .trade-container { flex: 1; overflow-y: auto; padding: 15px; position: relative; -webkit-overflow-scrolling: touch;}
+        
         .trade-header { background: var(--bg-base); padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid var(--border-color); text-align: center; position: relative;}
-        .trade-live-price { font-size: 28px; font-weight: bold; font-family: monospace; margin-bottom: 5px; }
+        .trade-live-price { font-size: 26px; font-weight: bold; font-family: monospace; margin-bottom: 5px; }
         .momentum-bar { height: 4px; border-radius: 2px; width: 100%; background: linear-gradient(to right, var(--color-sell) 50%, var(--color-buy) 50%); position: relative; }
         .momentum-indicator { position: absolute; height: 100%; width: 6px; background: white; border-radius: 2px; left: 50%; transform: translateX(-50%); transition: left 0.2s; box-shadow: 0 0 5px white;}
-        #whale-alert { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--color-accent); color: black; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; display: none; box-shadow: 0 0 10px var(--color-accent); white-space: nowrap;}
+        #whale-alert { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--color-accent); color: black; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; display: none; box-shadow: 0 0 10px var(--color-accent); white-space: nowrap; z-index: 5;}
 
+        /* AI SCANNER */
         .ai-scanner { background: rgba(24cd, 213, 53, 0.05); border: 1px solid var(--border-color); border-left: 3px solid var(--color-accent); padding: 12px; border-radius: 6px; margin-bottom: 15px; position: relative;}
-        .ai-title { font-weight: bold; color: var(--color-accent); font-size: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-        .ai-mode-selector { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--color-accent); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 10px; width: 100%; text-align: center; font-weight: bold; cursor: pointer;}
-        .scan-btn { background: var(--color-accent); color: black; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; width: 100%; margin-bottom: 5px; box-shadow: 0 0 8px rgba(252, 213, 53, 0.4); transition: 0.2s;}
+        .ai-title { font-weight: bold; color: var(--color-accent); font-size: 13px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .ai-mode-selector { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--color-accent); padding: 6px 8px; border-radius: 4px; font-size: 12px; margin-bottom: 10px; width: 100%; text-align: center; font-weight: bold; cursor: pointer;}
+        .scan-btn { background: var(--color-accent); color: black; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; width: 100%; margin-bottom: 5px; box-shadow: 0 0 8px rgba(252, 213, 53, 0.4); transition: 0.2s; text-transform: uppercase;}
         .scan-btn:hover { background: #eab308; transform: scale(1.02); }
         .ai-result { display: none; font-size: 12px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;}
-        .ai-badge { display: inline-block; padding: 6px 10px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; width: 100%; text-align: center; font-size: 14px; letter-spacing: 0.5px;}
-        .psychology-msg { font-style: italic; color: #b7c4d1; text-align: center; margin-bottom: 10px; font-size: 11px; background: var(--bg-input); padding: 5px; border-radius: 4px;}
-        .ai-data-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--text-muted); }
+        .ai-badge { display: inline-block; padding: 8px 10px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; width: 100%; text-align: center; font-size: 14px; letter-spacing: 0.5px;}
+        .psychology-msg { font-style: italic; color: #b7c4d1; text-align: center; margin-bottom: 10px; font-size: 11px; background: var(--bg-input); padding: 6px; border-radius: 4px; line-height: 1.4;}
+        .ai-data-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--text-muted); font-size: 12px;}
         .ai-data-row span { color: var(--text-main); font-family: monospace; font-weight: bold; }
-        .apply-ai-btn { background: transparent; border: 1px solid var(--color-buy); color: var(--color-buy); width: 100%; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.2s;}
+        .apply-ai-btn { background: transparent; border: 1px solid var(--color-buy); color: var(--color-buy); width: 100%; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.2s; font-size: 13px;}
         .apply-ai-btn:hover { background: var(--color-buy); color: white; }
 
+        /* INPUTS */
         .input-group { margin-bottom: 12px; }
         .input-label { color: var(--text-muted); font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; font-weight: bold; }
-        .lot-input-wrapper { display: flex; gap: 10px; }
+        .lot-input-wrapper { display: flex; gap: 10px; align-items: center; }
         .lot-box { flex: 1; }
-        input[type="number"] { width: 100%; padding: 10px; background: var(--bg-input); color: white; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; font-family: monospace; transition: border 0.2s;}
+        input[type="number"] { width: 100%; padding: 12px 10px; background: var(--bg-input); color: white; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px; outline: none; font-family: monospace; transition: border 0.2s;}
         input[type="number"]:focus { border-color: var(--color-accent); }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--color-accent); margin-top: 5px; }
         
         .quick-pct { display: flex; gap: 5px; margin-bottom: 15px; }
-        .pct-btn { flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: white; padding: 6px 0; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s;}
+        .pct-btn { flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: white; padding: 8px 0; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s;}
         .pct-btn:hover { background: #3b424d; border-color: var(--color-accent); }
 
-        .risk-calculator { background: rgba(0,0,0,0.3); border: 1px dashed var(--border-color); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; display: none; flex-direction: column; gap: 4px;}
+        .risk-calculator { background: rgba(0,0,0,0.3); border: 1px dashed var(--border-color); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; display: none; flex-direction: column; gap: 5px;}
         .risk-row { display: flex; justify-content: space-between; }
         .risk-row span:nth-child(2) { font-family: monospace; font-weight: bold; font-size: 13px;}
 
-        .trade-btns { display: flex; gap: 10px; margin-top: 10px; }
-        .btn { flex: 1; padding: 14px; font-size: 15px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; color: white; text-transform: uppercase; transition: 0.2s;}
+        .trade-btns { display: flex; gap: 10px; margin-top: 15px; margin-bottom: 20px;}
+        .btn { flex: 1; padding: 16px; font-size: 16px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; color: white; text-transform: uppercase; transition: 0.2s;}
         .buy-btn { background-color: var(--color-buy); } .buy-btn:hover { background-color: var(--color-buy-hover); transform: translateY(-2px);}
         .sell-btn { background-color: var(--color-sell); } .sell-btn:hover { background-color: var(--color-sell-hover); transform: translateY(-2px);}
 
         /* ---------------- VIEW 2: POSITIONS & HISTORY ---------------- */
-        #view-positions { flex-direction: column; background: var(--bg-base); padding: 20px; overflow-y: auto; }
-        .pos-page-header { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: white; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
-        .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; margin-bottom: 30px;}
+        #view-positions { flex-direction: column; background: var(--bg-base); padding: 15px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
+        .pos-page-header { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: white; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;}
+        .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 25px;}
         
-        .trade-card { background: var(--bg-panel); border-radius: 8px; padding: 15px; border-left: 4px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 12px; }
+        .trade-card { background: var(--bg-panel); border-radius: 8px; padding: 15px; border-left: 4px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 10px; }
         .trade-card.long-card { border-left-color: var(--color-buy); }
         .trade-card.short-card { border-left-color: var(--color-sell); }
         .tc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;}
-        .tc-title { font-size: 16px; font-weight: bold; color: white; display: flex; align-items: center; gap: 8px;}
+        .tc-title { font-size: 15px; font-weight: bold; color: white; display: flex; align-items: center; gap: 8px;}
         .type-badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px;}
         .type-long { background: rgba(14,203,129,0.15); color: var(--color-buy); border: 1px solid var(--color-buy); }
         .type-short { background: rgba(246,70,93,0.15); color: var(--color-sell); border: 1px solid var(--color-sell); }
-        .tc-pnl { font-size: 18px; font-weight: bold; font-family: monospace; text-align: right;}
+        .tc-pnl { font-size: 16px; font-weight: bold; font-family: monospace; text-align: right;}
         .tc-roe { font-size: 11px; }
         .tc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; }
         .tc-col { display: flex; flex-direction: column; gap: 3px;}
         .tc-lbl { color: var(--text-muted); font-size: 11px; }
-        .tc-val { color: var(--text-main); font-family: monospace; font-weight: bold; font-size: 14px;}
-        .tc-targets { background: var(--bg-input); padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;}
-        .action-group { display: flex; gap: 8px; margin-top: 5px; }
-        .action-btn { flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; font-size: 11px; transition: 0.2s;}
+        .tc-val { color: var(--text-main); font-family: monospace; font-weight: bold; font-size: 13px;}
+        .tc-targets { background: var(--bg-input); padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;}
+        
+        .action-group { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap;}
+        .action-btn { flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; font-size: 12px; transition: 0.2s;}
         .action-btn:hover { background: var(--color-sell); }
         .half-btn { background: transparent; border: 1px solid var(--color-accent); color: var(--color-accent); }
         .half-btn:hover { background: var(--color-accent); color: black; }
         .rev-btn { background: transparent; border: 1px solid #3b82f6; color: #3b82f6; }
         .rev-btn:hover { background: #3b82f6; color: white; }
-        .edit-icon { cursor: pointer; font-size: 11px; margin-left: 5px; padding: 3px 5px; background: var(--bg-panel); border-radius: 3px; border: 1px solid var(--border-color); transition: 0.2s;}
+        .edit-icon { cursor: pointer; font-size: 12px; margin-left: 5px; padding: 4px 6px; background: var(--bg-panel); border-radius: 4px; border: 1px solid var(--border-color); transition: 0.2s;}
         .edit-icon:hover { background: var(--color-accent); color: black; }
-        .be-btn { cursor: pointer; font-size: 10px; font-weight: bold; margin-left: 5px; padding: 2px 4px; background: rgba(14,203,129,0.2); color: var(--color-buy); border-radius: 3px; border: 1px solid var(--color-buy); }
-        .empty-state { text-align: center; padding: 50px; color: var(--text-muted); font-size: 16px; width: 100%; background: var(--bg-panel); border-radius: 8px; border: 1px dashed var(--border-color);}
+        .be-btn { cursor: pointer; font-size: 11px; font-weight: bold; margin-left: 5px; padding: 3px 6px; background: rgba(14,203,129,0.2); color: var(--color-buy); border-radius: 4px; border: 1px solid var(--color-buy); }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; width: 100%; background: var(--bg-panel); border-radius: 8px; border: 1px dashed var(--border-color);}
 
         /* ---------------- VIEW 3: DASHBOARD & ANALYTICS ---------------- */
-        #view-dashboard { flex-direction: column; background: var(--bg-base); padding: 30px; overflow-y: auto; gap: 30px;}
-        .dash-header { font-size: 28px; font-weight: bold; color: white; display: flex; justify-content: space-between; align-items: center;}
-        .reset-btn { background: rgba(246, 70, 93, 0.1); border: 1px solid var(--color-sell); color: var(--color-sell); padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;}
+        #view-dashboard { flex-direction: column; background: var(--bg-base); padding: 20px; overflow-y: auto; gap: 20px; -webkit-overflow-scrolling: touch;}
+        .dash-header { font-size: 22px; font-weight: bold; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
+        .reset-btn { background: rgba(246, 70, 93, 0.1); border: 1px solid var(--color-sell); color: var(--color-sell); padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;}
         .reset-btn:hover { background: var(--color-sell); color: white;}
         
-        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .dash-card { background: var(--bg-panel); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
-        .dash-card-title { color: var(--text-muted); font-size: 14px; font-weight: bold; text-transform: uppercase; }
-        .dash-card-val { font-size: 32px; font-weight: bold; font-family: monospace; color: white; }
-        .dash-card-sub { font-size: 13px; color: var(--text-muted); }
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        .dash-card { background: var(--bg-panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
+        .dash-card-title { color: var(--text-muted); font-size: 13px; font-weight: bold; text-transform: uppercase; }
+        .dash-card-val { font-size: 28px; font-weight: bold; font-family: monospace; color: white; }
+        .dash-card-sub { font-size: 12px; color: var(--text-muted); }
 
-        .disabled-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(11, 14, 17, 0.85); z-index: 50; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; flex-direction: column; backdrop-filter: blur(3px); display: none;}
-        .disabled-msg { color: var(--color-warning); font-size: 16px; font-weight: bold; margin-bottom: 10px;}
-        #toast { position: fixed; top: 20px; right: 20px; background: var(--bg-panel); border-left: 5px solid; padding: 15px 20px; border-radius: 4px; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none; z-index: 999; font-size: 14px; }
+        .disabled-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(11, 14, 17, 0.9); z-index: 50; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; flex-direction: column; backdrop-filter: blur(3px); display: none;}
+        .disabled-msg { color: var(--color-warning); font-size: 18px; font-weight: bold; margin-bottom: 10px;}
+        #toast { position: fixed; top: 20px; right: 50%; transform: translateX(50%); background: var(--bg-panel); border-left: 5px solid; padding: 15px 20px; border-radius: 6px; color: white; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.7); display: none; z-index: 9999; font-size: 14px; white-space: nowrap;}
 
-        @media (max-width: 900px) {
-            #view-terminal { flex-direction: column; height: auto; overflow: auto;}
-            .chart-container { width: 100%; height: 55vh; resize: none; border-right: none; border-bottom: 2px solid var(--border-color);}
-            .side-panel { width: 100%; height: auto; min-height: 50vh; }
-            .header { flex-direction: column; align-items: stretch; }
-            .stats-panel { justify-content: space-between; }
-            .app-nav { overflow-x: auto; white-space: nowrap; padding: 0 10px;}
+        /* ================== V17: GOD-LEVEL RESPONSIVE MEDIA QUERIES ================== */
+        @media (max-width: 1024px) {
+            /* TABLET / iPad VIEW */
+            .workspace { flex-direction: column !important; }
+            .chart-container { width: 100% !important; height: 50vh !important; border-right: none !important; border-bottom: 2px solid var(--border-color); resize: none !important; }
+            .side-panel { width: 100% !important; height: 50vh !important; }
+            .stats-panel { gap: 15px; }
+        }
+
+        @media (max-width: 600px) {
+            /* MOBILE PHONE VIEW */
+            .header { padding: 10px; justify-content: center; text-align: center;}
+            .logo { font-size: 16px; width: 100%; justify-content: center; margin-bottom: 5px;}
+            .stats-panel { width: 100%; justify-content: space-between; }
+            .close-all-btn { width: 100%; margin-top: 5px;}
+            
+            .app-nav { padding: 0 5px; }
+            .nav-item { padding: 10px 8px; font-size: 12px; }
+
+            .chart-container { height: 40vh !important; }
+            .side-panel { height: 60vh !important; }
+            
+            .trade-live-price { font-size: 24px; }
+            .pos-grid { grid-template-columns: 1fr; } /* 1 Card per row on mobile */
+            .dash-grid { grid-template-columns: 1fr; }
+            .dash-header { flex-direction: column; align-items: stretch; text-align: center;}
+            
+            .risk-row { font-size: 11px; }
+            .btn { font-size: 14px; padding: 14px;}
         }
     </style>
 </head>
@@ -195,7 +221,7 @@
                 <div class="stat-value" id="unrealized-pnl">$0.00</div>
             </div>
         </div>
-        <button class="close-all-btn" onclick="closeAll()">⚠ PANIC CLOSE ALL</button>
+        <button class="close-all-btn" onclick="closeAll()">⚠ CLOSE ALL</button>
     </div>
 
     <div class="tradingview-widget-container" style="background:var(--bg-base); border-bottom:1px solid var(--border-color);">
@@ -209,16 +235,16 @@
     </div>
 
     <div class="app-nav">
-        <div class="nav-item active" onclick="switchAppView('terminal')" id="nav-terminal">📈 Terminal (Chart & Scan)</div>
+        <div class="nav-item active" onclick="switchAppView('terminal')" id="nav-terminal">📈 Trade Terminal</div>
         <div class="nav-item" onclick="switchAppView('positions')" id="nav-positions">💼 Positions & History</div>
-        <div class="nav-item" onclick="switchAppView('dashboard')" id="nav-dashboard">🏠 Pro Analytics Dashboard</div>
+        <div class="nav-item" onclick="switchAppView('dashboard')" id="nav-dashboard">🏠 Analytics Dashboard</div>
     </div>
 
     <div id="view-terminal" class="app-view active workspace">
         <div class="chart-container" id="chart-box">
             <div class="chart-header">
                 <div class="chart-title" id="chart-title-display">BTCUSDT</div>
-                <button class="popout-btn" onclick="openChartInNewTab()">🌐 Open in New Tab</button>
+                <button class="popout-btn" onclick="openChartInNewTab()">🌐 Fullscreen</button>
             </div>
             <div id="tv_chart_container"></div>
         </div>
@@ -237,7 +263,7 @@
             <div class="trade-container">
                 <div class="disabled-overlay" id="non-crypto-overlay">
                     <div class="disabled-msg">🚫 Charting Mode Only</div>
-                    <div style="color:var(--text-muted); font-size:12px;">AI Scanner and Trading are for Crypto only.</div>
+                    <div style="color:var(--text-muted); font-size:13px; line-height: 1.5;">AI Scanner and Live Trading are optimized for Crypto pairs only.<br><br>Please search a Crypto (e.g., BTC, ETH) to enable trading.</div>
                 </div>
 
                 <div class="trade-header">
@@ -279,7 +305,7 @@
                     <label class="input-label"><span>Cost (Margin USDT)</span> <span>Size (Quantity)</span></label>
                     <div class="lot-input-wrapper">
                         <div class="lot-box"><input type="number" id="margin-amount" placeholder="Margin $" onkeyup="syncSizeFromMargin(); calculateRiskReward();" onchange="calculateRiskReward()"></div>
-                        <div style="color:var(--text-muted); padding-top:10px;">⇄</div>
+                        <div style="color:var(--text-muted); font-size:18px;">⇄</div>
                         <div class="lot-box"><input type="number" id="qty-amount" placeholder="Size" onkeyup="syncMarginFromSize(); calculateRiskReward();" onchange="calculateRiskReward()"></div>
                     </div>
                 </div>
@@ -312,7 +338,7 @@
                     <button class="btn buy-btn" onclick="placeOrder('LONG')">LONG / BUY</button>
                     <button class="btn sell-btn" onclick="placeOrder('SHORT')">SHORT / SELL</button>
                 </div>
-            </div>
+                <br> </div>
         </div>
     </div>
 
@@ -378,16 +404,14 @@
             { id: "RELIANCE", name: "Reliance Ind", tv: "NSE:RELIANCE", isCrypto: false }
         ];
 
-        // --- 🧠 V16: NAVIGATION SYSTEM ---
+        // --- View Navigation ---
         function switchAppView(viewName) {
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
             document.getElementById(`view-${viewName}`).classList.add('active');
             document.getElementById(`nav-${viewName}`).classList.add('active');
-
             if(viewName === 'dashboard') updateDashboardStats();
-            if(viewName === 'positions') updateUI(); // Refresh positions page
+            if(viewName === 'positions') updateUI(); 
         }
 
         document.addEventListener('click', (e) => {
@@ -496,6 +520,28 @@
         function initApp() { fetchAllCryptoPairs(); updateUI(); updateDashboardStats(); }
         initApp();
         window.addEventListener('storage', (e) => { if (e.key === 'v6CloseAllTrigger') closeAll(); });
+
+        function openChartInNewTab() {
+            let tvSymbol = isCrypto ? `BINANCE:${currentAsset}` : allAssetsList.find(a=>a.id===currentAsset).tv;
+            let newTab = window.open("", "_blank");
+            newTab.document.write(`<html><head><title>${currentAsset} Full Chart</title><style>body{margin:0;background:#0b0e11;display:flex;flex-direction:column;height:100vh;color:white;}.sync-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#181a20;border-bottom:1px solid #2b3139;font-family:sans-serif;}.close-btn{background:#ff0000;color:white;border:none;padding:8px 15px;border-radius:4px;font-weight:bold;cursor:pointer;}</style></head><body><div class="sync-bar"><div style="color:#fcd535;font-size:18px;font-weight:900;">⚡ Fullscreen Chart</div><button class="close-btn" onclick="localStorage.setItem('v6CloseAllTrigger', Date.now().toString());">⚠ CLOSE ALL</button></div><div id="tv_popup_container" style="flex:1;width:100%;"></div><script type="text/javascript" src="https://s3.tradingview.com/tv.js"><\/script><script>new TradingView.widget({"autosize":true,"symbol":"${tvSymbol}","interval":"5","theme":"dark","style":"1","backgroundColor":"#181a20","gridColor":"#2b3139","container_id":"tv_popup_container","hide_side_toolbar":false});<\/script></body></html>`);
+        }
+
+        // --- Audio & Flash ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if(type === 'open') { osc.type = 'sine'; osc.frequency.setValueAtTime(500, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1); }
+            else if(type === 'profit') { osc.type = 'square'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1); osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2); }
+            else if(type === 'loss') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3); }
+            osc.start(); gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4); osc.stop(audioCtx.currentTime + 0.5);
+        }
+        function triggerScreenFlash(isProfit) {
+            let body = document.body; body.classList.remove('flash-profit', 'flash-loss');
+            void body.offsetWidth; body.classList.add(isProfit ? 'flash-profit' : 'flash-loss');
+        }
 
         // --- Websocket Live ---
         const ws = new WebSocket("wss://stream.binance.com:9443/ws/!miniTicker@arr");
@@ -758,7 +804,7 @@
             t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
         }
 
-        // --- 🧠 V16: POSITIONS PAGE & DASHBOARD RENDER ---
+        // --- View Updates ---
         function updateUI() {
             document.getElementById('wallet-balance').childNodes[0].nodeValue = `$${balance.toFixed(2)} `;
             document.getElementById('page-count-active').innerText = positions.length;
@@ -809,18 +855,12 @@
             document.getElementById('page-tab-history').innerHTML = historyData.length ? htmlHistory : `<div class="empty-state">No Trading History yet.</div>`;
         }
 
-        // 🧠 PRO ANALYTICS CALCULATOR
         function updateDashboardStats() {
             let totalTrades = historyData.length;
             let winningTrades = historyData.filter(h => h.pnl > 0).length;
             let winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
-            
             let grossPnl = historyData.reduce((sum, h) => sum + h.pnl, 0);
-            
-            let bestTrade = 0;
-            if(totalTrades > 0) {
-                bestTrade = Math.max(...historyData.map(h => h.pnl));
-            }
+            let bestTrade = totalTrades > 0 ? Math.max(...historyData.map(h => h.pnl)) : 0;
 
             document.getElementById('dash-total-trades').innerText = totalTrades;
             document.getElementById('dash-winrate').innerText = `${winRate.toFixed(1)}%`;
@@ -829,7 +869,6 @@
             let pnlEl = document.getElementById('dash-gross-pnl');
             pnlEl.innerText = `${grossPnl >= 0 ? '+' : ''}$${grossPnl.toFixed(2)}`;
             pnlEl.style.color = grossPnl >= 0 ? 'var(--color-buy)' : 'var(--color-sell)';
-
             document.getElementById('dash-best-trade').innerText = `+$${Math.max(0, bestTrade).toFixed(2)}`;
         }
 
