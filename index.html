@@ -17,7 +17,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; -webkit-tap-highlight-color: transparent;}
         body { background-color: var(--bg-base); color: var(--text-main); font-size: 13px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; width: 100vw;}
 
-        /* Custom Sleek Scrollbar */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 4px; }
@@ -45,18 +44,12 @@
         .close-all-btn { background: #ff0000; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); transition: 0.2s; font-size: 12px;}
         .close-all-btn:hover { background: #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.6); }
 
-        /* APP NAVIGATION BAR */
-        .app-nav { display: flex; background: var(--bg-base); border-bottom: 1px solid var(--border-color); padding: 0 15px; gap: 15px; flex-shrink: 0; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;}
-        .nav-item { padding: 12px 5px; color: var(--text-muted); font-weight: bold; font-size: 13px; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
-        .nav-item:hover { color: var(--text-main); }
-        .nav-item.active { color: var(--color-accent); border-bottom: 3px solid var(--color-accent); color: white;}
-
-        /* APP VIEWS */
+        /* APP VIEWS - FLEX 1 to fill space above nav */
         .app-view { display: none; flex: 1; overflow: hidden; width: 100%; }
         .app-view.active { display: flex; }
 
-        /* ---------------- VIEW 1: TERMINAL (Responsive Flex) ---------------- */
-        #view-terminal { flex-direction: row; }
+        /* ---------------- VIEW 1: TERMINAL ---------------- */
+        #view-terminal { flex-direction: row; position: relative;}
         .chart-container { display: flex; flex-direction: column; background: var(--bg-panel); border-right: 1px solid var(--border-color); resize: horizontal; overflow: hidden; min-width: 300px; width: 65%; position: relative;}
         .chart-container::-webkit-resizer { background: var(--color-accent); }
         .chart-header { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid var(--border-color); align-items: center; background: var(--bg-panel); flex-shrink: 0;}
@@ -65,7 +58,7 @@
         .popout-btn:hover { background: var(--color-accent); color: black; border-color: var(--color-accent); }
         #tv_chart_container { flex: 1; width: 100%; height: 100%; }
 
-        .side-panel { flex: 1; display: flex; flex-direction: column; min-width: 300px; background: var(--bg-base); overflow: hidden; }
+        .side-panel { flex: 1; display: flex; flex-direction: column; min-width: 320px; background: var(--bg-base); overflow: hidden; position: relative;}
         
         .asset-selector-header { padding: 10px 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); z-index: 10; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); flex-shrink: 0;}
         .search-wrapper { position: relative; }
@@ -120,7 +113,7 @@
         .buy-btn { background-color: var(--color-buy); } .buy-btn:hover { background-color: var(--color-buy-hover); transform: translateY(-2px);}
         .sell-btn { background-color: var(--color-sell); } .sell-btn:hover { background-color: var(--color-sell-hover); transform: translateY(-2px);}
 
-        /* ---------------- VIEW 2: POSITIONS & HISTORY ---------------- */
+        /* ---------------- VIEW 2: POSITIONS ---------------- */
         #view-positions { flex-direction: column; background: var(--bg-base); padding: 15px; overflow-y: auto; -webkit-overflow-scrolling: touch;}
         .pos-page-header { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: white; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;}
         .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 25px;}
@@ -153,12 +146,11 @@
         .be-btn { cursor: pointer; font-size: 11px; font-weight: bold; margin-left: 5px; padding: 3px 6px; background: rgba(14,203,129,0.2); color: var(--color-buy); border-radius: 4px; border: 1px solid var(--color-buy); }
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; width: 100%; background: var(--bg-panel); border-radius: 8px; border: 1px dashed var(--border-color);}
 
-        /* ---------------- VIEW 3: DASHBOARD & ANALYTICS ---------------- */
+        /* ---------------- VIEW 3: DASHBOARD ---------------- */
         #view-dashboard { flex-direction: column; background: var(--bg-base); padding: 20px; overflow-y: auto; gap: 20px; -webkit-overflow-scrolling: touch;}
         .dash-header { font-size: 22px; font-weight: bold; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
         .reset-btn { background: rgba(246, 70, 93, 0.1); border: 1px solid var(--color-sell); color: var(--color-sell); padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;}
         .reset-btn:hover { background: var(--color-sell); color: white;}
-        
         .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
         .dash-card { background: var(--bg-panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
         .dash-card-title { color: var(--text-muted); font-size: 13px; font-weight: bold; text-transform: uppercase; }
@@ -169,34 +161,80 @@
         .disabled-msg { color: var(--color-warning); font-size: 18px; font-weight: bold; margin-bottom: 10px;}
         #toast { position: fixed; top: 20px; right: 50%; transform: translateX(50%); background: var(--bg-panel); border-left: 5px solid; padding: 15px 20px; border-radius: 6px; color: white; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.7); display: none; z-index: 9999; font-size: 14px; white-space: nowrap;}
 
-        /* ================== V17: GOD-LEVEL RESPONSIVE MEDIA QUERIES ================== */
-        @media (max-width: 1024px) {
-            /* TABLET / iPad VIEW */
-            .workspace { flex-direction: column !important; }
-            .chart-container { width: 100% !important; height: 50vh !important; border-right: none !important; border-bottom: 2px solid var(--border-color); resize: none !important; }
-            .side-panel { width: 100% !important; height: 50vh !important; }
-            .stats-panel { gap: 15px; }
-        }
+        /* 🧠 BOTTOM NAVIGATION BAR (NATIVE APP FEEL) */
+        .app-nav { display: flex; background: var(--bg-panel); border-top: 1px solid var(--border-color); padding: 0; justify-content: space-around; flex-shrink: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); z-index: 1000;}
+        .nav-item { flex: 1; text-align: center; padding: 12px 5px; color: var(--text-muted); font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-bottom: 3px solid transparent;}
+        .nav-item:hover { color: var(--text-main); background: var(--bg-input);}
+        .nav-item.active { color: var(--color-accent); border-bottom: 3px solid var(--color-accent); background: rgba(252, 213, 53, 0.05);}
+        .nav-icon { font-size: 18px; }
 
-        @media (max-width: 600px) {
-            /* MOBILE PHONE VIEW */
+        /* THE MOBILE TOGGLE ARROW */
+        .mobile-toggle-btn { display: none; }
+        .mobile-close-btn { display: none; }
+
+        /* ================== V18: GOD-LEVEL RESPONSIVE MEDIA QUERIES ================== */
+        @media (max-width: 900px) {
+            /* Make header smaller */
             .header { padding: 10px; justify-content: center; text-align: center;}
             .logo { font-size: 16px; width: 100%; justify-content: center; margin-bottom: 5px;}
             .stats-panel { width: 100%; justify-content: space-between; }
             .close-all-btn { width: 100%; margin-top: 5px;}
-            
-            .app-nav { padding: 0 5px; }
-            .nav-item { padding: 10px 8px; font-size: 12px; }
 
-            .chart-container { height: 40vh !important; }
-            .side-panel { height: 60vh !important; }
+            /* Workspace setup for Slide Drawer */
+            #view-terminal { position: relative; overflow: hidden; display: block; }
+            .chart-container { width: 100% !important; height: 100% !important; border: none; resize: none; }
             
+            /* 🧠 THE SLIDING DRAWER PANEL */
+            .side-panel { 
+                position: absolute; 
+                right: -100%; /* Hidden by default */
+                top: 0; 
+                width: 85%; 
+                height: 100%; 
+                z-index: 1000; 
+                box-shadow: -5px 0 20px rgba(0,0,0,0.8); 
+                transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            }
+            .side-panel.open { right: 0; }
+
+            /* The Floating Arrow Button */
+            .mobile-toggle-btn {
+                display: flex;
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--color-accent);
+                color: black;
+                padding: 15px 8px;
+                border-radius: 10px 0 0 10px;
+                cursor: pointer;
+                z-index: 900;
+                font-weight: bold;
+                font-size: 16px;
+                box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+                align-items: center;
+                text-align: center;
+                line-height: 1.2;
+            }
+            
+            .mobile-close-btn {
+                display: flex;
+                background: var(--color-sell);
+                color: white;
+                font-weight: bold;
+                padding: 12px;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                font-size: 14px;
+                flex-shrink: 0;
+            }
+
             .trade-live-price { font-size: 24px; }
-            .pos-grid { grid-template-columns: 1fr; } /* 1 Card per row on mobile */
+            .pos-grid { grid-template-columns: 1fr; } 
             .dash-grid { grid-template-columns: 1fr; }
             .dash-header { flex-direction: column; align-items: stretch; text-align: center;}
-            
-            .risk-row { font-size: 11px; }
             .btn { font-size: 14px; padding: 14px;}
         }
     </style>
@@ -221,10 +259,10 @@
                 <div class="stat-value" id="unrealized-pnl">$0.00</div>
             </div>
         </div>
-        <button class="close-all-btn" onclick="closeAll()">⚠ CLOSE ALL</button>
+        <button class="close-all-btn" onclick="closeAll()">⚠ PANIC CLOSE</button>
     </div>
 
-    <div class="tradingview-widget-container" style="background:var(--bg-base); border-bottom:1px solid var(--border-color);">
+    <div class="tradingview-widget-container" style="background:var(--bg-base); border-bottom:1px solid var(--border-color); flex-shrink: 0;">
         <div class="tradingview-widget-container__widget"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-ticker-tape.js" async>
         {
@@ -234,22 +272,22 @@
         </script>
     </div>
 
-    <div class="app-nav">
-        <div class="nav-item active" onclick="switchAppView('terminal')" id="nav-terminal">📈 Trade Terminal</div>
-        <div class="nav-item" onclick="switchAppView('positions')" id="nav-positions">💼 Positions & History</div>
-        <div class="nav-item" onclick="switchAppView('dashboard')" id="nav-dashboard">🏠 Analytics Dashboard</div>
-    </div>
-
     <div id="view-terminal" class="app-view active workspace">
+        
         <div class="chart-container" id="chart-box">
             <div class="chart-header">
                 <div class="chart-title" id="chart-title-display">BTCUSDT</div>
                 <button class="popout-btn" onclick="openChartInNewTab()">🌐 Fullscreen</button>
             </div>
             <div id="tv_chart_container"></div>
+            
+            <div class="mobile-toggle-btn" id="mobile-toggle-btn" onclick="toggleDrawer()">◀<br>T<br>R<br>A<br>D<br>E</div>
         </div>
 
-        <div class="side-panel">
+        <div class="side-panel" id="side-panel-drawer">
+            
+            <div class="mobile-close-btn" onclick="toggleDrawer()">❌ Close Panel</div>
+
             <div class="asset-selector-header">
                 <div class="search-wrapper">
                     <input type="text" id="asset-search" class="search-input" placeholder="🔍 Search Gold, Nifty, Coins..." oninput="handleSearch()" onclick="handleSearch()" autocomplete="off">
@@ -338,7 +376,8 @@
                     <button class="btn buy-btn" onclick="placeOrder('LONG')">LONG / BUY</button>
                     <button class="btn sell-btn" onclick="placeOrder('SHORT')">SHORT / SELL</button>
                 </div>
-                <br> </div>
+                <br>
+            </div>
         </div>
     </div>
 
@@ -380,6 +419,21 @@
         </div>
     </div>
 
+    <div class="app-nav">
+        <div class="nav-item active" onclick="switchAppView('terminal')" id="nav-terminal">
+            <div class="nav-icon">📈</div>
+            Terminal
+        </div>
+        <div class="nav-item" onclick="switchAppView('positions')" id="nav-positions">
+            <div class="nav-icon">💼</div>
+            Positions
+        </div>
+        <div class="nav-item" onclick="switchAppView('dashboard')" id="nav-dashboard">
+            <div class="nav-icon">🏠</div>
+            Dashboard
+        </div>
+    </div>
+
     <script>
         // --- 1. Global Variables & Data State ---
         let balance = parseFloat(localStorage.getItem('v6Balance')) || 10000.00;
@@ -404,12 +458,30 @@
             { id: "RELIANCE", name: "Reliance Ind", tv: "NSE:RELIANCE", isCrypto: false }
         ];
 
+        // --- 🧠 V18: MOBILE DRAWER TOGGLE LOGIC ---
+        function toggleDrawer() {
+            let drawer = document.getElementById('side-panel-drawer');
+            let toggleBtn = document.getElementById('mobile-toggle-btn');
+            if(drawer.classList.contains('open')) {
+                drawer.classList.remove('open');
+                toggleBtn.style.display = 'flex'; // Show arrow when closed
+            } else {
+                drawer.classList.add('open');
+                toggleBtn.style.display = 'none'; // Hide arrow when panel is open
+            }
+        }
+
         // --- View Navigation ---
         function switchAppView(viewName) {
             document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`view-${viewName}`).classList.add('active');
             document.getElementById(`nav-${viewName}`).classList.add('active');
+            
+            // Auto-close drawer if leaving terminal
+            let drawer = document.getElementById('side-panel-drawer');
+            if(drawer.classList.contains('open')) toggleDrawer();
+
             if(viewName === 'dashboard') updateDashboardStats();
             if(viewName === 'positions') updateUI(); 
         }
@@ -469,6 +541,9 @@
             
             document.getElementById('non-crypto-overlay').style.display = isCrypto ? 'none' : 'flex';
             initTradingView(asset.tv); syncSizeFromMargin(); whalePreviousPrice = 0; 
+            
+            // Auto close drawer on mobile after selection for better UX
+            if(window.innerWidth <= 900) toggleDrawer();
         }
 
         function changeAssetFromDropdown() {
@@ -479,6 +554,8 @@
             document.getElementById('non-crypto-overlay').style.display = 'none';
             initTradingView(select.options[select.selectedIndex].getAttribute('data-tv')); 
             syncSizeFromMargin(); whalePreviousPrice = 0;
+
+            if(window.innerWidth <= 900) toggleDrawer();
         }
 
         // --- TV Chart ---
@@ -696,6 +773,9 @@
             document.getElementById('tp-price').value = aiCalculatedTP.toFixed(dec);
             document.getElementById('sl-price').value = aiCalculatedSL.toFixed(dec);
             calculateRiskReward(); showToast("AI Targets Applied!", "success");
+            
+            // Auto close drawer on mobile so user can see chart with targets
+            if(window.innerWidth <= 900) toggleDrawer();
         }
 
         // --- Trading Execution ---
@@ -718,6 +798,9 @@
             document.getElementById('margin-amount').value = ''; document.getElementById('qty-amount').value = ''; 
             document.getElementById('tp-price').value = ''; document.getElementById('sl-price').value = '';
             document.getElementById('risk-calculator').style.display = "none";
+
+            // Redirect to positions tab automatically to see the trade
+            switchAppView('positions');
         }
 
         function editTradeTarget(id, type) {
