@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Crypto Pro | God-Level Trading Terminal</title>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        :root {
+            --bg-base: #0b0e11; --bg-panel: #181a20; --bg-input: #2b3139;
+            --text-main: #eaecef; --text-muted: #848e9c;
+            --color-buy: #0ecb81; --color-buy-hover: #0b9e65;
+            --color-sell: #f6465d; --color-sell-hover: #c9354a;
+            --color-accent: #fcd535; --border-color: #2b3139;
+            --color-warning: #ff9800;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-main); font-size: 13px; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* Custom Sleek Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+
+        .flash-profit { animation: flashGreen 0.6s ease-out; }
+        .flash-loss { animation: flashRed 0.6s ease-out; }
+        @keyframes flashGreen { 0% { background-color: rgba(14, 203, 129, 0.4); } 100% { background-color: var(--bg-base); } }
+        @keyframes flashRed { 0% { background-color: rgba(246, 70, 93, 0.4); } 100% { background-color: var(--bg-base); } }
+        @keyframes whalePulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); flex-shrink: 0; flex-wrap: wrap; gap: 10px;}
+        .logo { color: var(--color-accent); font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px;}
+        .live-clock { font-family: monospace; font-size: 14px; color: var(--text-muted); background: var(--bg-input); padding: 4px 10px; border-radius: 4px; }
+        
+        .stats-panel { display: flex; gap: 30px; flex-wrap: wrap;}
+        .stat-box { display: flex; flex-direction: column; justify-content: center; }
+        .stat-title { color: var(--text-muted); font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 3px; }
+        .stat-value { font-size: 18px; font-weight: bold; font-family: monospace; display: flex; align-items: center; gap: 8px;}
+        .roi-badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--bg-input); }
+        .green { color: var(--color-buy) !important; } .red { color: var(--color-sell) !important; }
+        .margin-bar-bg { width: 100%; height: 4px; background: var(--bg-input); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+        .margin-bar-fill { height: 100%; width: 0%; background: var(--color-accent); transition: width 0.3s; }
+        .close-all-btn { background: #ff0000; color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(255,0,0,0.3); transition: 0.2s;}
+        .close-all-btn:hover { background: #cc0000; box-shadow: 0 0 15px rgba(255,0,0,0.6); }
+
+        /* WORKSPACE LAYOUT (Responsive) */
+        .workspace { display: flex; flex: 1; overflow: hidden; height: calc(100vh - 65px); flex-direction: row; }
+        .chart-container { display: flex; flex-direction: column; background: var(--bg-panel); border-right: 1px solid var(--border-color); resize: horizontal; overflow: hidden; min-width: 40%; width: 65%; position: relative;}
+        .chart-container::-webkit-resizer { background: var(--color-accent); }
+        .chart-header { display: flex; justify-content: space-between; padding: 8px 15px; border-bottom: 1px solid var(--border-color); align-items: center; background: var(--bg-panel); }
+        .chart-title { font-size: 18px; font-weight: bold; color: var(--color-accent); font-family: monospace; letter-spacing: 1px; }
+        .popout-btn { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); padding: 4px 10px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; font-size: 11px;}
+        .popout-btn:hover { background: var(--color-accent); color: black; border-color: var(--color-accent); }
+        #tv_chart_container { flex: 1; width: 100%; height: 100%; }
+
+        .side-panel { flex: 1; display: flex; flex-direction: column; min-width: 320px; background: var(--bg-base); overflow: hidden; }
+        
+        .asset-selector-header { padding: 10px 15px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); z-index: 10; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);}
+        .search-wrapper { position: relative; }
+        .search-input { width: 100%; background: var(--bg-base); color: white; border: 1px solid var(--color-accent); padding: 8px 12px; border-radius: 4px; font-weight: bold; outline: none; font-size: 13px; transition: border 0.3s;}
+        .search-input:focus { border-color: white; box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+        .search-list { position: absolute; top: 100%; left: 0; width: 100%; background: var(--bg-input); border: 1px solid var(--color-accent); border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .search-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;}
+        .search-item:hover { background: var(--bg-panel); color: var(--color-accent); }
+        select { background: var(--bg-input); color: white; border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 4px; font-weight: bold; outline: none; font-size: 13px; width: 100%; cursor: pointer;}
+        
+        .trade-container { flex: 1; overflow-y: auto; padding: 15px; position: relative; }
+        
+        .trade-header { background: var(--bg-base); padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid var(--border-color); text-align: center; position: relative;}
+        .trade-live-price { font-size: 28px; font-weight: bold; font-family: monospace; margin-bottom: 5px; }
+        .momentum-bar { height: 4px; border-radius: 2px; width: 100%; background: linear-gradient(to right, var(--color-sell) 50%, var(--color-buy) 50%); position: relative; }
+        .momentum-indicator { position: absolute; height: 100%; width: 6px; background: white; border-radius: 2px; left: 50%; transform: translateX(-50%); transition: left 0.2s; box-shadow: 0 0 5px white;}
+        
+        /* Whale Tracker Indicator */
+        #whale-alert { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--color-accent); color: black; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; display: none; box-shadow: 0 0 10px var(--color-accent); white-space: nowrap;}
+
+        /* AI SCANNER */
+        .ai-scanner { background: rgba(24cd, 213, 53, 0.05); border: 1px solid var(--border-color); border-left: 3px solid var(--color-accent); padding: 12px; border-radius: 6px; margin-bottom: 15px; position: relative;}
+        .ai-title { font-weight: bold; color: var(--color-accent); font-size: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .ai-mode-selector { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--color-accent); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 10px; width: 100%; text-align: center; font-weight: bold; cursor: pointer;}
+        .scan-btn { background: var(--color-accent); color: black; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; width: 100%; margin-bottom: 5px; box-shadow: 0 0 8px rgba(252, 213, 53, 0.4); transition: 0.2s;}
+        .scan-btn:hover { background: #eab308; transform: scale(1.02); }
+        .ai-result { display: none; font-size: 12px; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;}
+        .ai-badge { display: inline-block; padding: 6px 10px; border-radius: 4px; font-weight: bold; margin-bottom: 8px; width: 100%; text-align: center; font-size: 14px; letter-spacing: 0.5px;}
+        .psychology-msg { font-style: italic; color: #b7c4d1; text-align: center; margin-bottom: 10px; font-size: 11px; background: var(--bg-input); padding: 5px; border-radius: 4px;}
+        .ai-data-row { display: flex; justify-content: space-between; margin-bottom: 5px; color: var(--text-muted); }
+        .ai-data-row span { color: var(--text-main); font-family: monospace; font-weight: bold; }
+        .apply-ai-btn { background: transparent; border: 1px solid var(--color-buy); color: var(--color-buy); width: 100%; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.2s;}
+        .apply-ai-btn:hover { background: var(--color-buy); color: white; }
+
+        /* INPUTS */
+        .input-group { margin-bottom: 12px; }
+        .input-label { color: var(--text-muted); font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; font-weight: bold; }
+        .lot-input-wrapper { display: flex; gap: 10px; }
+        .lot-box { flex: 1; }
+        input[type="number"] { width: 100%; padding: 10px; background: var(--bg-input); color: white; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; outline: none; font-family: monospace; transition: border 0.2s;}
+        input[type="number"]:focus { border-color: var(--color-accent); }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--color-accent); margin-top: 5px; }
+        
+        .quick-pct { display: flex; gap: 5px; margin-bottom: 15px; }
+        .pct-btn { flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: white; padding: 6px 0; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s;}
+        .pct-btn:hover { background: #3b424d; border-color: var(--color-accent); }
+
+        /* God-Level Feature: Pre-Trade Risk Calculator */
+        .risk-calculator { background: rgba(0,0,0,0.3); border: 1px dashed var(--border-color); padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 12px; display: none; flex-direction: column; gap: 4px;}
+        .risk-row { display: flex; justify-content: space-between; }
+        .risk-row span:nth-child(2) { font-family: monospace; font-weight: bold; font-size: 13px;}
+
+        .trade-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .btn { flex: 1; padding: 14px; font-size: 15px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; color: white; text-transform: uppercase; transition: 0.2s;}
+        .buy-btn { background-color: var(--color-buy); } .buy-btn:hover { background-color: var(--color-buy-hover); transform: translateY(-2px);}
+        .sell-btn { background-color: var(--color-sell); } .sell-btn:hover { background-color: var(--color-sell-hover); transform: translateY(-2px);}
+        
+        /* BOTTOM SECTION */
+        .bottom-section { flex: 1; min-height: 250px; background: var(--bg-base); display: flex; flex-direction: column; overflow: hidden; border-top: 2px solid var(--border-color);}
+        .tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); flex-shrink: 0;}
+        .tab { padding: 12px 20px; cursor: pointer; color: var(--text-muted); font-weight: bold; font-size: 13px; border-bottom: 2px solid transparent; transition: 0.2s;}
+        .tab.active { color: var(--color-accent); border-bottom: 2px solid var(--color-accent); color: white;}
+        
+        .card-container { overflow-y: auto; flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 10px;}
+        .trade-card { background: var(--bg-panel); border-radius: 8px; padding: 12px 15px; border-left: 4px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; }
+        .trade-card.long-card { border-left-color: var(--color-buy); }
+        .trade-card.short-card { border-left-color: var(--color-sell); }
+        
+        .tc-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;}
+        .tc-title { font-size: 16px; font-weight: bold; color: white; display: flex; align-items: center; gap: 8px;}
+        .type-badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px;}
+        .type-long { background: rgba(14,203,129,0.15); color: var(--color-buy); border: 1px solid var(--color-buy); }
+        .type-short { background: rgba(246,70,93,0.15); color: var(--color-sell); border: 1px solid var(--color-sell); }
+        .tc-pnl { font-size: 16px; font-weight: bold; font-family: monospace; text-align: right;}
+        .tc-roe { font-size: 11px; }
+
+        .tc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; }
+        .tc-col { display: flex; flex-direction: column; gap: 3px;}
+        .tc-lbl { color: var(--text-muted); font-size: 11px; }
+        .tc-val { color: var(--text-main); font-family: monospace; font-weight: bold; font-size: 13px;}
+        
+        .tc-targets { background: var(--bg-input); padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12px;}
+        
+        .action-group { display: flex; gap: 8px; margin-top: 5px; }
+        .action-btn { flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; font-size: 11px; transition: 0.2s;}
+        .action-btn:hover { background: var(--color-sell); }
+        .half-btn { background: transparent; border: 1px solid var(--color-accent); color: var(--color-accent); }
+        .half-btn:hover { background: var(--color-accent); color: black; }
+        .rev-btn { background: transparent; border: 1px solid #3b82f6; color: #3b82f6; }
+        .rev-btn:hover { background: #3b82f6; color: white; }
+        
+        .edit-icon { cursor: pointer; font-size: 10px; margin-left: 5px; padding: 2px 4px; background: var(--bg-panel); border-radius: 3px; border: 1px solid var(--border-color); transition: 0.2s;}
+        .edit-icon:hover { background: var(--color-accent); color: black; }
+        .be-btn { cursor: pointer; font-size: 10px; font-weight: bold; margin-left: 5px; padding: 2px 4px; background: rgba(14,203,129,0.2); color: var(--color-buy); border-radius: 3px; border: 1px solid var(--color-buy); }
+
+        .disabled-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(11, 14, 17, 0.85); z-index: 50; display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; flex-direction: column; backdrop-filter: blur(3px); display: none;}
+        .disabled-msg { color: var(--color-warning); font-size: 16px; font-weight: bold; margin-bottom: 10px;}
+
+        #toast { position: fixed; top: 20px; right: 20px; background: var(--bg-panel); border-left: 5px solid; padding: 15px 20px; border-radius: 4px; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none; z-index: 999; font-size: 14px; }
+
+        /* V15: RESPONSIVE MEDIA QUERIES */
+        @media (max-width: 900px) {
+            .workspace { flex-direction: column; height: auto; overflow: auto;}
+            .chart-container { width: 100%; height: 50vh; resize: none; border-right: none; border-bottom: 2px solid var(--border-color);}
+            .side-panel { width: 100%; height: auto; min-height: 50vh; }
+            .header { flex-direction: column; align-items: stretch; }
+            .stats-panel { justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast">Message</div>
+
+    <div class="header">
+        <div class="logo">
+            ⚡ The Crypto Pro (God-Level)
+            <div class="live-clock" id="clock">00:00:00</div>
+        </div>
+        <div class="stats-panel">
+            <div class="stat-box">
+                <div class="stat-title">Wallet Balance</div>
+                <div class="stat-value" id="wallet-balance">$10,000.00 <span class="roi-badge" id="roi-badge">0.00%</span></div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Live PnL (Unrealized)</div>
+                <div class="stat-value" id="unrealized-pnl">$0.00</div>
+            </div>
+        </div>
+        <button class="close-all-btn" onclick="closeAll()">⚠ CLOSE ALL</button>
+    </div>
+
+    <div class="workspace">
+        <div class="chart-container" id="chart-box">
+            <div class="chart-header">
+                <div class="chart-title" id="chart-title-display">BTCUSDT</div>
+                <button class="popout-btn" onclick="openChartInNewTab()">🌐 Open in New Tab</button>
+            </div>
+            <div id="tv_chart_container"></div>
+        </div>
+
+        <div class="side-panel">
+            <div class="asset-selector-header">
+                <div class="search-wrapper">
+                    <input type="text" id="asset-search" class="search-input" placeholder="🔍 Search Gold, Nifty, Coins..." oninput="handleSearch()" onclick="handleSearch()" autocomplete="off">
+                    <div class="search-list" id="search-list"></div>
+                </div>
+                <select id="asset-select" onchange="changeAssetFromDropdown()">
+                    <option value="BTCUSDT" data-tv="BINANCE:BTCUSDT">Loading Top Crypto List... ⏳</option>
+                </select>
+            </div>
+
+            <div class="trade-container">
+                <div class="disabled-overlay" id="non-crypto-overlay">
+                    <div class="disabled-msg">🚫 Charting Mode Only</div>
+                    <div style="color:var(--text-muted); font-size:12px;">AI Scanner and Trading are for Crypto only.</div>
+                </div>
+
+                <div class="trade-header">
+                    <div id="whale-alert">🐋 WHALE ACTIVITY</div>
+                    <div class="trade-live-price" id="trade-live-price">0.00</div>
+                    <div class="momentum-bar"><div class="momentum-indicator" id="momentum-indicator"></div></div>
+                </div>
+
+                <div class="ai-scanner">
+                    <div class="ai-title">🧠 Deep Price Action Engine</div>
+                    <select id="scalp-mode" class="ai-mode-selector">
+                        <option value="1m_quick">⚡ 1m Sniper (Quick Entry, Tight SL)</option>
+                        <option value="5m_standard" selected>⚖️ 5m Standard (Balanced RR)</option>
+                        <option value="15m_patient">🧘‍♂️ 15m Patient (Big Swings)</option>
+                    </select>
+                    <button class="scan-btn" onclick="runAIScan()" id="scan-btn">🔍 DEEP SCAN CHART</button>
+                    
+                    <div class="ai-result" id="ai-result">
+                        <div id="ai-badge" class="ai-badge">Analyzing...</div>
+                        <div id="psychology-msg" class="psychology-msg">Wait for the perfect setup...</div>
+                        
+                        <div class="ai-data-row">Order Pressure: <span id="ai-pressure">-</span></div>
+                        <div class="ai-data-row">Big Bar / Momentum: <span id="ai-bigbar">-</span></div>
+                        <div class="ai-data-row">Market State: <span id="ai-range">-</span></div>
+                        <div class="ai-data-row">Major S/R Zones: <span id="ai-zones">-</span></div>
+                        <div class="ai-data-row">Candle Pattern: <span id="ai-pattern" style="color:var(--color-accent);">-</span></div>
+                        <br>
+                        <div class="ai-data-row" style="color:var(--color-buy)">Calculated TP: <span id="ai-tp-val">-</span></div>
+                        <div class="ai-data-row" style="color:var(--color-sell)">Smart SL: <span id="ai-sl-val">-</span></div>
+                        <button class="apply-ai-btn" id="apply-ai-btn" onclick="applyAITargets()">✨ Apply Strategy Targets</button>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Leverage: <span id="lev-val" style="color:var(--color-accent)">10x</span></label>
+                    <input type="range" id="leverage" min="1" max="125" value="10" oninput="updateLev()">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label"><span>Cost (Margin USDT)</span> <span>Size (Quantity)</span></label>
+                    <div class="lot-input-wrapper">
+                        <div class="lot-box"><input type="number" id="margin-amount" placeholder="Margin $" onkeyup="syncSizeFromMargin(); calculateRiskReward();" onchange="calculateRiskReward()"></div>
+                        <div style="color:var(--text-muted); padding-top:10px;">⇄</div>
+                        <div class="lot-box"><input type="number" id="qty-amount" placeholder="Size" onkeyup="syncMarginFromSize(); calculateRiskReward();" onchange="calculateRiskReward()"></div>
+                    </div>
+                </div>
+
+                <div class="quick-pct">
+                    <button class="pct-btn" onclick="setMarginPct(0.1)">10%</button>
+                    <button class="pct-btn" onclick="setMarginPct(0.25)">25%</button>
+                    <button class="pct-btn" onclick="setMarginPct(0.5)">50%</button>
+                    <button class="pct-btn" onclick="setMarginPct(1)">MAX</button>
+                </div>
+
+                <div class="lot-input-wrapper">
+                    <div class="lot-box input-group">
+                        <label class="input-label" style="color:var(--color-buy)">Take Profit (TP)</label>
+                        <input type="number" id="tp-price" placeholder="Target" onkeyup="calculateRiskReward()" onchange="calculateRiskReward()">
+                    </div>
+                    <div class="lot-box input-group">
+                        <label class="input-label" style="color:var(--color-sell)">Stop Loss (SL)</label>
+                        <input type="number" id="sl-price" placeholder="Stop" onkeyup="calculateRiskReward()" onchange="calculateRiskReward()">
+                    </div>
+                </div>
+
+                <div class="risk-calculator" id="risk-calculator">
+                    <div class="risk-row"><span>Proj. Profit (Long):</span> <span id="calc-profit" class="green">--</span></div>
+                    <div class="risk-row"><span>Proj. Loss (Long):</span> <span id="calc-loss" class="red">--</span></div>
+                    <div class="risk-row"><span>Risk/Reward Ratio:</span> <span id="calc-rr" style="color:var(--color-accent)">--</span></div>
+                </div>
+
+                <div class="trade-btns">
+                    <button class="btn buy-btn" onclick="placeOrder('LONG')">LONG / BUY</button>
+                    <button class="btn sell-btn" onclick="placeOrder('SHORT')">SHORT / SELL</button>
+                </div>
+            </div>
+
+            <div class="bottom-section">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('active')">Active (<span id="count-active">0</span>)</div>
+                    <div class="tab" onclick="switchTab('history')">History</div>
+                </div>
+                <div class="card-container" id="tab-active"></div>
+                <div class="card-container" id="tab-history" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Global Variables & Data State ---
+        let balance = parseFloat(localStorage.getItem('v6Balance')) || 10000.00;
+        let positions = JSON.parse(localStorage.getItem('v6Positions')) || [];
+        let historyData = JSON.parse(localStorage.getItem('v6History')) || [];
+        let currentAsset = "BTCUSDT";
+        let isCrypto = true;
+        let allLivePrices = {}; 
+        let lastPrices = []; 
+        let whalePreviousPrice = 0; // For Whale Tracker
+        let tvWidgetInstance = null; 
+        const STARTING_BALANCE = 10000.00;
+        let aiCalculatedTP = null;
+        let aiCalculatedSL = null;
+
+        const nameMap = { "BTCUSDT": "Bitcoin", "ETHUSDT": "Ethereum", "SOLUSDT": "Solana", "DOGEUSDT": "Dogecoin", "XRPUSDT": "Ripple", "BNBUSDT": "Binance Coin", "PEPEUSDT": "Pepe Coin", "SHIBUSDT": "Shiba Inu", "ADAUSDT": "Cardano" };
+        
+        let allAssetsList = [
+            { id: "XAUUSD", name: "Gold (Spot)", tv: "OANDA:XAUUSD", isCrypto: false },
+            { id: "USOIL", name: "Crude Oil (WTI)", tv: "TVC:USOIL", isCrypto: false },
+            { id: "NIFTY", name: "Nifty 50 Index", tv: "NSE:NIFTY", isCrypto: false },
+            { id: "BANKNIFTY", name: "Bank Nifty", tv: "NSE:BANKNIFTY", isCrypto: false },
+            { id: "RELIANCE", name: "Reliance Ind", tv: "NSE:RELIANCE", isCrypto: false }
+        ];
+
+        // Ensure clicking outside closes search
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.search-wrapper')) document.getElementById('search-list').style.display = 'none';
+        });
+
+        // --- 2. Dynamic Fetching & Search ---
+        async function fetchAllCryptoPairs() {
+            try {
+                let res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+                let data = await res.json();
+                let usdtPairs = data.filter(d => d.symbol.endsWith('USDT')).sort((a,b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume)).slice(0, 150);
+                
+                let select = document.getElementById('asset-select'); select.innerHTML = '';
+                
+                usdtPairs.forEach(p => {
+                    let friendlyName = nameMap[p.symbol] || p.symbol.replace('USDT', '');
+                    let isTop = ['BTC','ETH','SOL','BNB','DOGE'].includes(p.symbol.replace('USDT',''));
+                    allAssetsList.push({ id: p.symbol, name: `${friendlyName} / USDT`, tv: `BINANCE:${p.symbol}`, isCrypto: true });
+                    
+                    let opt = document.createElement('option');
+                    opt.value = p.symbol; opt.setAttribute('data-tv', `BINANCE:${p.symbol}`);
+                    opt.innerText = isTop ? `🔥 ${friendlyName} / USDT` : `${friendlyName} / USDT`;
+                    select.appendChild(opt);
+                });
+                select.value = currentAsset;
+                initTradingView(); 
+            } catch(e) { showToast("Network Error: Using cached assets.", "warning"); initTradingView(); }
+        }
+
+        function handleSearch() {
+            let val = document.getElementById('asset-search').value.toLowerCase();
+            let listEl = document.getElementById('search-list');
+            listEl.innerHTML = '';
+            let filtered = allAssetsList.filter(a => a.name.toLowerCase().includes(val) || a.id.toLowerCase().includes(val));
+            if(filtered.length === 0 || val.length === 0) { listEl.style.display = 'none'; return; }
+            filtered.slice(0, 15).forEach(asset => {
+                let div = document.createElement('div'); div.className = 'search-item';
+                div.innerHTML = `<span><b>${asset.name}</b></span> <span style="font-size:10px; color:var(--text-muted)">${asset.isCrypto?'Crypto':'Stock'}</span>`;
+                div.onclick = () => selectAsset(asset);
+                listEl.appendChild(div);
+            });
+            listEl.style.display = 'block';
+        }
+
+        function selectAsset(asset) {
+            document.getElementById('search-list').style.display = 'none';
+            document.getElementById('asset-search').value = asset.name;
+            currentAsset = asset.id; isCrypto = asset.isCrypto;
+            
+            let selectEl = document.getElementById('asset-select');
+            let found = Array.from(selectEl.options).find(o => o.value === currentAsset);
+            if(found) selectEl.value = currentAsset; else selectEl.value = ""; 
+            
+            document.getElementById('non-crypto-overlay').style.display = isCrypto ? 'none' : 'flex';
+            initTradingView(asset.tv); syncSizeFromMargin(); whalePreviousPrice = 0; // Reset whale tracker
+        }
+
+        function changeAssetFromDropdown() {
+            let select = document.getElementById('asset-select');
+            if(!select.value) return;
+            currentAsset = select.value; isCrypto = true;
+            document.getElementById('asset-search').value = ""; 
+            document.getElementById('non-crypto-overlay').style.display = 'none';
+            let tvSymbol = select.options[select.selectedIndex].getAttribute('data-tv');
+            initTradingView(tvSymbol); syncSizeFromMargin(); whalePreviousPrice = 0;
+        }
+
+        // --- 3. TradingView Chart Injection (Bug Free) ---
+        function initTradingView(symbolOverride = null) {
+            let tvSymbol = symbolOverride || `BINANCE:${currentAsset}`;
+            document.getElementById('chart-title-display').innerText = currentAsset;
+            document.getElementById('ai-result').style.display = 'none'; 
+
+            if(tvWidgetInstance) {
+                try {
+                    tvWidgetInstance.setSymbol(tvSymbol, "5", function() { console.log("Synced"); });
+                } catch(e) {
+                    try { tvWidgetInstance.activeChart().setSymbol(tvSymbol, function(){}); } 
+                    catch(err) {
+                        document.getElementById('tv_chart_container').innerHTML = '';
+                        tvWidgetInstance = null; initTradingView(tvSymbol);
+                    }
+                }
+            } else {
+                tvWidgetInstance = new TradingView.widget({
+                    "autosize": true, "symbol": tvSymbol, "interval": "5", "timezone": "Etc/UTC",
+                    "theme": "dark", "style": "1", "locale": "en", "enable_publishing": false,
+                    "backgroundColor": "#181a20", "gridColor": "#2b3139", "hide_top_toolbar": false,
+                    "hide_side_toolbar": false, "allow_symbol_change": true, "save_image": false,
+                    "container_id": "tv_chart_container", "toolbar_bg": "#181a20",
+                    "disabled_features": ["header_symbol_search"]
+                });
+
+                tvWidgetInstance.onChartReady(function() {
+                    tvWidgetInstance.activeChart().onSymbolChanged().subscribe(null, function(newSymbolObj) {
+                        let newSym = newSymbolObj.name;
+                        if(newSym.includes(':')) newSym = newSym.split(':')[1];
+                        if(newSym !== currentAsset) {
+                            currentAsset = newSym;
+                            document.getElementById('chart-title-display').innerText = currentAsset;
+                            let select = document.getElementById('asset-select');
+                            let found = Array.from(select.options).find(o => o.value === currentAsset);
+                            if(found) select.value = currentAsset;
+                            syncSizeFromMargin(); whalePreviousPrice = 0;
+                        }
+                    });
+                });
+            }
+        }
+
+        function initApp() { fetchAllCryptoPairs(); updateUI(); }
+        initApp();
+
+        window.addEventListener('storage', (e) => { if (e.key === 'v6CloseAllTrigger') closeAll(); });
+
+        // --- 4. Live Prices & Whale Tracker ---
+        const ws = new WebSocket("wss://stream.binance.com:9443/ws/!miniTicker@arr");
+        ws.onmessage = (e) => {
+            let data = JSON.parse(e.data);
+            data.forEach(t => {
+                allLivePrices[t.s] = parseFloat(t.c); 
+                if(t.s === currentAsset && isCrypto) {
+                    let price = allLivePrices[currentAsset];
+                    let el = document.getElementById('trade-live-price');
+                    let dec = price < 0.1 ? 6 : price < 10 ? 4 : 2; 
+                    el.innerText = price.toFixed(dec);
+                    el.style.color = Math.random() > 0.5 ? '#0ecb81' : '#f6465d';
+
+                    // Momentum Bar
+                    lastPrices.push(price);
+                    if(lastPrices.length > 5) lastPrices.shift();
+                    if(lastPrices.length === 5) {
+                        let diff = lastPrices[4] - lastPrices[0];
+                        let percentMove = (diff / lastPrices[0]) * 10000; 
+                        let pos = 50 + Math.max(-50, Math.min(50, percentMove)); 
+                        document.getElementById('momentum-indicator').style.left = `${pos}%`;
+                    }
+
+                    // 🧠 V15 WHALE TRACKER
+                    if(whalePreviousPrice > 0) {
+                        let tickMovePct = Math.abs((price - whalePreviousPrice) / whalePreviousPrice * 100);
+                        if(tickMovePct > 0.15) { // 0.15% jump in a single tick is massive for Crypto
+                            let wAlert = document.getElementById('whale-alert');
+                            wAlert.innerText = price > whalePreviousPrice ? "🐋 WHALE BUY (Pump)" : "🐋 WHALE SELL (Dump)";
+                            wAlert.style.background = price > whalePreviousPrice ? "var(--color-buy)" : "var(--color-sell)";
+                            wAlert.style.display = "block";
+                            wAlert.style.animation = "whalePulse 0.5s ease-out";
+                            setTimeout(() => { wAlert.style.display = "none"; }, 2000);
+                        }
+                    }
+                    whalePreviousPrice = price;
+                }
+            });
+        };
+
+        // --- 5. Calculator & Logic ---
+        function updateLev() { document.getElementById('lev-val').innerText = document.getElementById('leverage').value + 'x'; syncSizeFromMargin(); calculateRiskReward(); }
+        
+        function syncSizeFromMargin() {
+            if(!isCrypto) return;
+            let m = parseFloat(document.getElementById('margin-amount').value);
+            let lev = parseFloat(document.getElementById('leverage').value);
+            let cp = allLivePrices[currentAsset];
+            if(m && lev && cp) { document.getElementById('qty-amount').value = ((m * lev) / cp).toFixed(cp < 0.1 ? 0 : cp < 10 ? 2 : 4); } 
+            else { document.getElementById('qty-amount').value = ''; }
+            calculateRiskReward();
+        }
+        
+        function syncMarginFromSize() {
+            if(!isCrypto) return;
+            let q = parseFloat(document.getElementById('qty-amount').value);
+            let lev = parseFloat(document.getElementById('leverage').value);
+            let cp = allLivePrices[currentAsset];
+            if(q && lev && cp) { document.getElementById('margin-amount').value = ((q * cp) / lev).toFixed(2); } 
+            else { document.getElementById('margin-amount').value = ''; }
+            calculateRiskReward();
+        }
+        
+        function setMarginPct(pct) { document.getElementById('margin-amount').value = (balance * pct).toFixed(2); syncSizeFromMargin(); }
+
+        // 🧠 V15: LIVE PRE-TRADE CALCULATOR
+        function calculateRiskReward() {
+            let qty = parseFloat(document.getElementById('qty-amount').value);
+            let tp = parseFloat(document.getElementById('tp-price').value);
+            let sl = parseFloat(document.getElementById('sl-price').value);
+            let cp = allLivePrices[currentAsset];
+            let calcBox = document.getElementById('risk-calculator');
+
+            if(qty && cp && (tp || sl)) {
+                let profitStr = "--"; let lossStr = "--"; let rrStr = "--";
+                let riskAmount = 0; let rewardAmount = 0;
+
+                if(tp) {
+                    rewardAmount = Math.abs((tp - cp) * qty);
+                    profitStr = `+$${rewardAmount.toFixed(2)}`;
+                }
+                if(sl) {
+                    riskAmount = Math.abs((cp - sl) * qty);
+                    lossStr = `-$${riskAmount.toFixed(2)}`;
+                }
+                
+                if(tp && sl && riskAmount > 0) {
+                    let rr = rewardAmount / riskAmount;
+                    rrStr = `1 : ${rr.toFixed(1)}`;
+                }
+
+                document.getElementById('calc-profit').innerText = profitStr;
+                document.getElementById('calc-loss').innerText = lossStr;
+                document.getElementById('calc-rr').innerText = rrStr;
+                calcBox.style.display = "flex";
+            } else {
+                calcBox.style.display = "none";
+            }
+        }
+
+        // --- 6. Deep AI Scanner ---
+        async function runAIScan() {
+            if (!isCrypto) { return showToast("AI Scanner is optimized for Crypto markets only.", "warning"); }
+            let btn = document.getElementById('scan-btn');
+            let resBox = document.getElementById('ai-result');
+            let cp = allLivePrices[currentAsset];
+            let scalpMode = document.getElementById('scalp-mode').value;
+            let tf = scalpMode.split('_')[0]; 
+            
+            if(!cp) return showToast("Live price not available yet!", "error");
+            btn.innerText = "⏳ DEEP SCANNING..."; btn.disabled = true;
+            
+            try {
+                let res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${currentAsset}&interval=${tf}&limit=100`);
+                let data = await res.json();
+                
+                let opens = data.map(d => parseFloat(d[1])); let highs = data.map(d => parseFloat(d[2]));
+                let lows = data.map(d => parseFloat(d[3])); let closes = data.map(d => parseFloat(d[4]));
+                let volumes = data.map(d => parseFloat(d[5]));
+
+                let trArr = []; for(let i = closes.length - 15; i < closes.length; i++) { trArr.push(Math.max(highs[i]-lows[i], Math.abs(highs[i]-closes[i-1]), Math.abs(lows[i]-closes[i-1]))); }
+                let atr = trArr.reduce((a,b)=>a+b)/trArr.length;
+
+                let recentHighs = highs.slice(-50); let recentLows = lows.slice(-50);
+                let resistance = Math.max(...recentHighs); let support = Math.min(...recentLows);
+                let isNearSupport = (cp - support) <= (atr * 1.5);
+                let isNearResistance = (resistance - cp) <= (atr * 1.5);
+
+                let buyVol = 0; let sellVol = 0;
+                for(let i = closes.length - 15; i < closes.length; i++) {
+                    if(closes[i] >= opens[i]) buyVol += volumes[i];
+                    else sellVol += volumes[i];
+                }
+                let isBuyersControl = buyVol > (sellVol * 1.3);
+                let isSellersControl = sellVol > (buyVol * 1.3);
+
+                let lastBody = Math.abs(closes[closes.length-2] - opens[opens.length-2]);
+                let isBullishBigBar = closes[closes.length-2] > opens[opens.length-2] && lastBody > (atr * 1.8);
+                let isBearishBigBar = closes[closes.length-2] < opens[opens.length-2] && lastBody > (atr * 1.8);
+
+                let slice10H = Math.max(...highs.slice(-10, -1)); let slice10L = Math.min(...lows.slice(-10, -1));
+                let isConsolidating = (slice10H - slice10L) < (atr * 2.5);
+
+                let lastOpen = opens[opens.length-2]; let lastClose = closes[closes.length-2];
+                let lastHigh = highs[highs.length-2]; let lastLow = lows[lows.length-2];
+                let prevOpen = opens[opens.length-3]; let prevClose = closes[closes.length-3];
+                let body = Math.abs(lastClose - lastOpen);
+                let upperWick = lastHigh - Math.max(lastOpen, lastClose); let lowerWick = Math.min(lastOpen, lastClose) - lastLow;
+
+                let pattern = "Inside / Choppy"; let isBullPattern = false; let isBearPattern = false;
+                if (lastClose > prevOpen && lastOpen < prevClose && prevOpen > prevClose) { pattern = "Bullish Engulfing 🟢"; isBullPattern = true; } 
+                else if (lastClose < prevOpen && lastOpen > prevClose && prevOpen < prevClose) { pattern = "Bearish Engulfing 🔴"; isBearPattern = true; } 
+                else if(lowerWick > body * 2 && upperWick < body) { pattern = "Bullish Pin Bar / Sweep 🔨"; isBullPattern = true; } 
+                else if(upperWick > body * 2 && lowerWick < body) { pattern = "Bearish Pin Bar ☄️"; isBearPattern = true; }
+                else if(isBullishBigBar) { pattern = "Institutional Buy Bar 🚀"; isBullPattern = true; }
+                else if(isBearishBigBar) { pattern = "Institutional Sell Bar 🩸"; isBearPattern = true; }
+
+                let score = 0;
+                if(isNearSupport) score += 2; if(isNearResistance) score -= 2;
+                if(isBuyersControl) score += 2; if(isSellersControl) score -= 2;
+                if(isBullPattern) score += 2; if(isBearPattern) score -= 2;
+                if(isBullishBigBar) score += 3; if(isBearishBigBar) score -= 3;
+
+                let signal = "NO TRADE ZONE 🚫"; 
+                let psychoMsg = "Market is choppy. Wait for clear breakout or S/R reaction.";
+                let color = "var(--text-main)"; let bg = "var(--bg-input)";
+                aiCalculatedTP = null; aiCalculatedSL = null; let dec = cp < 0.1 ? 6 : cp < 10 ? 4 : 2;
+
+                let rrMultiplier = scalpMode === '1m_quick' ? 1.5 : scalpMode === '5m_standard' ? 2 : 3;
+                let slMultiplier = scalpMode === '1m_quick' ? 1 : scalpMode === '5m_standard' ? 1.5 : 2;
+
+                if (isConsolidating && score > -3 && score < 3) {
+                    signal = "CONSOLIDATION ⚠️ (WAIT)"; color = "var(--color-warning)"; bg = "rgba(255, 152, 0, 0.1)";
+                    psychoMsg = `Market ek range me fasa hai. ${isBuyersControl ? 'Par buyers pressure bana rahe hain, Wait for upside breakout.' : 'Sellers daba rahe hain, break ka wait karo.'}`;
+                } 
+                else if (score >= 5) {
+                    signal = `STRONG BUY 🟢 [${tf}]`; color = "#000"; bg = "var(--color-buy)";
+                    psychoMsg = "High Accuracy Setup: Buyers Control + Bullish Momentum. Go Long!";
+                    aiCalculatedSL = cp - (atr * slMultiplier); aiCalculatedTP = cp + (atr * rrMultiplier); 
+                }
+                else if (score <= -5) {
+                    signal = `STRONG SELL 🔴 [${tf}]`; color = "#FFF"; bg = "var(--color-sell)";
+                    psychoMsg = "Institutional Selling Detected: Breakdown confirm. Short it!";
+                    aiCalculatedSL = cp + (atr * slMultiplier); aiCalculatedTP = cp - (atr * rrMultiplier); 
+                }
+                else if (score >= 2) {
+                    signal = `SCALP BUY ↗️ [${tf}]`; color = "#000"; bg = "var(--color-buy)";
+                    psychoMsg = "Slight Bullish Edge. Can take a quick scalp with tight risk.";
+                    aiCalculatedSL = cp - (atr * 0.8); aiCalculatedTP = cp + (atr * 1); 
+                }
+                else if (score <= -2) {
+                    signal = `SCALP SELL ↘️ [${tf}]`; color = "#FFF"; bg = "var(--color-sell)";
+                    psychoMsg = "Slight Bearish Edge. Scalp short with strict SL.";
+                    aiCalculatedSL = cp + (atr * 0.8); aiCalculatedTP = cp - (atr * 1); 
+                }
+
+                let badge = document.getElementById('ai-badge');
+                badge.innerText = signal; badge.style.background = bg; badge.style.color = color; badge.style.border = `1px solid ${color}`;
+                document.getElementById('psychology-msg').innerText = psychoMsg;
+                document.getElementById('psychology-msg').style.color = color !== "var(--text-main)" ? color : "var(--text-muted)";
+                
+                document.getElementById('ai-pressure').innerText = isBuyersControl ? "Buyers Aggressive 🟩" : isSellersControl ? "Sellers Aggressive 🟥" : "Equal / Low Volume ➖";
+                document.getElementById('ai-pressure').style.color = isBuyersControl ? "var(--color-buy)" : isSellersControl ? "var(--color-sell)" : "var(--text-main)";
+                document.getElementById('ai-bigbar').innerText = isBullishBigBar ? "Bullish Breakout Bar 🚀" : isBearishBigBar ? "Bearish Dump Bar 🩸" : "Normal Candles";
+                document.getElementById('ai-range').innerText = isConsolidating ? "Trapped in Range 📦" : "Trending 🌊";
+                document.getElementById('ai-zones').innerText = `R: ${resistance.toFixed(dec)} | S: ${support.toFixed(dec)}`;
+                document.getElementById('ai-pattern').innerText = pattern;
+                
+                let tpEl = document.getElementById('ai-tp-val'); let slEl = document.getElementById('ai-sl-val');
+                let applyBtn = document.getElementById('apply-ai-btn');
+
+                if (aiCalculatedTP && aiCalculatedSL) {
+                    tpEl.innerText = aiCalculatedTP.toFixed(dec); slEl.innerText = aiCalculatedSL.toFixed(dec);
+                    applyBtn.style.display = "block";
+                } else {
+                    tpEl.innerText = "Wait for Breakout"; slEl.innerText = "Wait for Breakout"; applyBtn.style.display = "none";
+                }
+                resBox.style.display = 'block';
+
+            } catch(e) { showToast("API limit reached or network error.", "error"); }
+            btn.innerText = "🔍 DEEP SCAN CHART"; btn.disabled = false;
+        }
+
+        function applyAITargets() {
+            if(!aiCalculatedTP || !aiCalculatedSL) return;
+            let cp = allLivePrices[currentAsset] || 1;
+            let dec = cp < 0.1 ? 6 : cp < 10 ? 4 : 2;
+            document.getElementById('tp-price').value = aiCalculatedTP.toFixed(dec);
+            document.getElementById('sl-price').value = aiCalculatedSL.toFixed(dec);
+            calculateRiskReward();
+            showToast("AI Strategy Targets Applied!", "success");
+        }
+
+        // --- 7. Trade Execution ---
+        function placeOrder(direction) {
+            if(!isCrypto) return showToast("Live Trading disabled for Non-Crypto.", "error");
+            let margin = parseFloat(document.getElementById('margin-amount').value);
+            let qty = parseFloat(document.getElementById('qty-amount').value);
+            let lev = parseFloat(document.getElementById('leverage').value);
+            let tp = parseFloat(document.getElementById('tp-price').value) || null;
+            let sl = parseFloat(document.getElementById('sl-price').value) || null;
+            let price = allLivePrices[currentAsset];
+
+            if(!price) return showToast("Live price not ready!", "error");
+            if(isNaN(margin) || margin <= 0 || margin > balance) return showToast("Invalid Margin or Low Balance!", "error");
+            if(!sl) {
+                let confirmNoSL = confirm("PRO WARNING: Stop Loss nahi lagaya hai! Account wash ho sakta hai. Proceed without SL?");
+                if(!confirmNoSL) return;
+            }
+            
+            balance -= margin;
+            let pos = {
+                id: Date.now(), asset: currentAsset, type: direction, margin: margin, leverage: lev,
+                entryPrice: price, size: qty || ((margin * lev) / price), tp: tp, sl: sl
+            };
+
+            positions.push(pos); saveData(); updateUI(); playSound('open');
+            showToast(`${direction} Opened at ${price.toFixed(4)}`, "success");
+            
+            document.getElementById('margin-amount').value = ''; document.getElementById('qty-amount').value = ''; 
+            document.getElementById('tp-price').value = ''; document.getElementById('sl-price').value = '';
+            document.getElementById('risk-calculator').style.display = "none";
+        }
+
+        function editTradeTarget(id, type) {
+            let pos = positions.find(p => p.id === id); if(!pos) return;
+            let newVal = prompt(`Enter new ${type.toUpperCase()} for ${pos.asset}:\nLeave blank to remove.`, pos[type] ? pos[type] : '');
+            if(newVal === null) return; newVal = parseFloat(newVal);
+            if(isNaN(newVal) || newVal <= 0) { pos[type] = null; showToast(`${type.toUpperCase()} Removed!`, "success"); } 
+            else { pos[type] = newVal; showToast(`${type.toUpperCase()} Updated!`, "success"); }
+            saveData(); updateUI();
+        }
+
+        function setBreakeven(id) {
+            let pos = positions.find(p => p.id === id); if(!pos) return;
+            pos.sl = pos.entryPrice; saveData(); updateUI();
+            showToast(`SL moved to Entry`, "success");
+        }
+
+        function reversePosition(id) {
+            let pos = positions.find(p => p.id === id); if(!pos) return;
+            let currentP = allLivePrices[pos.asset] || pos.entryPrice;
+            let newType = pos.type === 'LONG' ? 'SHORT' : 'LONG';
+            let oldMargin = pos.margin; let oldLev = pos.leverage; let oldAsset = pos.asset; let oldSize = pos.size;
+            
+            closeTrade(id, "Reversed", 1.0, true);
+            if(balance < oldMargin) return showToast("Not enough balance to Reverse!", "error");
+            balance -= oldMargin;
+
+            positions.push({ id: Date.now(), asset: oldAsset, type: newType, margin: oldMargin, leverage: oldLev, entryPrice: currentP, size: oldSize, tp: null, sl: null });
+            saveData(); updateUI(); playSound('open'); showToast(`Position Reversed!`, "success");
+        }
+
+        setInterval(() => {
+            let totalUnrealized = 0; let totalUsedMargin = 0;
+
+            positions.forEach(pos => {
+                totalUsedMargin += pos.margin;
+                let currentP = allLivePrices[pos.asset] || pos.entryPrice; 
+                let pnl = pos.type === 'LONG' ? (currentP - pos.entryPrice) * pos.size : (pos.entryPrice - currentP) * pos.size;
+                let roe = (pnl / pos.margin) * 100;
+                totalUnrealized += pnl;
+
+                let pnlEl = document.getElementById(`pnl-${pos.id}`);
+                let prcEl = document.getElementById(`prc-${pos.id}`);
+                
+                if(pnlEl && prcEl) {
+                    prcEl.innerText = currentP < 10 ? currentP.toFixed(4) : currentP.toFixed(2);
+                    pnlEl.innerHTML = `<div>${pnl>=0?'+':''}$${pnl.toFixed(2)}</div><div class="tc-roe" style="color:${roe>=0?'var(--color-buy)':'var(--color-sell)'};">(${roe>=0?'+':''}${roe.toFixed(2)}%)</div>`;
+                    pnlEl.style.color = pnl >= 0 ? 'var(--color-buy)' : 'var(--color-sell)';
+                }
+
+                if(roe <= -99) closeTrade(pos.id, "Liquidated");
+                else if(pos.sl && ((pos.type==='LONG' && currentP<=pos.sl) || (pos.type==='SHORT' && currentP>=pos.sl))) closeTrade(pos.id, "Stop Loss Hit");
+                else if(pos.tp && ((pos.type==='LONG' && currentP>=pos.tp) || (pos.type==='SHORT' && currentP<=pos.tp))) closeTrade(pos.id, "Target Hit 🎯");
+            });
+
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+            let unEl = document.getElementById('unrealized-pnl');
+            unEl.innerText = `${totalUnrealized>=0?'+':''}$${totalUnrealized.toFixed(2)}`;
+            unEl.className = totalUnrealized >= 0 ? 'stat-value green' : 'stat-value red';
+
+            let currentTotalEquity = balance + totalUsedMargin + totalUnrealized;
+            let roiPct = ((currentTotalEquity - STARTING_BALANCE) / STARTING_BALANCE) * 100;
+            document.getElementById('roi-badge').innerText = `${roiPct>=0?'+':''}${roiPct.toFixed(2)}% ROI`;
+            document.getElementById('roi-badge').style.color = roiPct >= 0 ? 'var(--color-buy)' : 'var(--color-sell)';
+            
+            let marginPct = currentTotalEquity > 0 ? (totalUsedMargin / currentTotalEquity) * 100 : 0;
+            document.getElementById('margin-bar').style.width = `${Math.min(marginPct, 100)}%`;
+            document.getElementById('margin-bar').style.background = marginPct > 80 ? 'var(--color-sell)' : 'var(--color-accent)';
+
+        }, 100);
+
+        function closeTrade(id, reason="Manual", fraction = 1.0, silent = false) {
+            let idx = positions.findIndex(p => p.id === id); if(idx === -1) return;
+            let pos = positions[idx]; let currentP = allLivePrices[pos.asset] || pos.entryPrice;
+            
+            let fullPnl = pos.type === 'LONG' ? (currentP - pos.entryPrice) * pos.size : (pos.entryPrice - currentP) * pos.size;
+            if(reason.includes("Liquidated")) fullPnl = -pos.margin;
+            let realizePnl = fullPnl * fraction; let realizeMargin = pos.margin * fraction;
+            
+            balance += (realizeMargin + realizePnl);
+            historyData.unshift({ asset: pos.asset, type: pos.type, entry: pos.entryPrice, exit: currentP, pnl: realizePnl, reason: reason + (fraction < 1 ? ' (50%)' : '') });
+            if(historyData.length > 50) historyData.pop(); 
+            
+            if(fraction === 1.0) positions.splice(idx, 1);
+            else { pos.margin -= realizeMargin; pos.size -= (pos.size * fraction); }
+            saveData(); updateUI();
+            
+            if(!silent) {
+                playSound(realizePnl >= 0 ? 'profit' : 'loss'); triggerScreenFlash(realizePnl >= 0); 
+                if(!reason.includes("Panic")) showToast(`Closed ${fraction*100}% (${reason})`, realizePnl>=0?'success':'error');
+            }
+        }
+        function closeAll() { if(positions.length === 0) return; while(positions.length > 0) closeTrade(positions[0].id, "Panic Close"); showToast("All Closed!", "success"); }
+        function switchTab(tab) {
+            document.getElementById('tab-active').style.display = tab === 'active' ? 'flex' : 'none';
+            document.getElementById('tab-history').style.display = tab === 'history' ? 'flex' : 'none';
+            let tabs = document.querySelectorAll('.tabs .tab');
+            tabs[0].className = tab === 'active' ? 'tab active' : 'tab'; tabs[1].className = tab === 'history' ? 'tab active' : 'tab';
+        }
+        function showToast(msg, type) {
+            let t = document.getElementById('toast'); t.innerText = msg;
+            t.style.borderLeftColor = type === 'success' ? 'var(--color-buy)' : 'var(--color-sell)';
+            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function updateUI() {
+            document.getElementById('wallet-balance').childNodes[0].nodeValue = `$${balance.toFixed(2)} `;
+            document.getElementById('count-active').innerText = positions.length;
+            
+            let tb = document.getElementById('tab-active');
+            if(positions.length === 0) {
+                tb.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:40px 10px; font-size:14px;">No Active Trades</div>`;
+            } else {
+                tb.innerHTML = positions.map(p => {
+                    let dec = p.entryPrice < 0.1 ? 6 : p.entryPrice < 10 ? 4 : 2;
+                    let sizeDec = p.entryPrice < 0.1 ? 0 : 4;
+                    let cardClass = p.type === 'LONG' ? 'long-card' : 'short-card';
+                    return `
+                    <div class="trade-card ${cardClass}">
+                        <div class="tc-header">
+                            <div class="tc-title">${p.asset} <span class="type-badge ${p.type==='LONG'?'type-long':'type-short'}">${p.type} ${p.leverage}x</span></div>
+                            <div class="tc-pnl" id="pnl-${p.id}">0.00</div>
+                        </div>
+                        <div class="tc-grid">
+                            <div class="tc-col"><span class="tc-lbl">Margin ($)</span><span class="tc-val">$${p.margin.toFixed(2)}</span></div>
+                            <div class="tc-col"><span class="tc-lbl">Size/Qty</span><span class="tc-val">${p.size.toFixed(sizeDec)}</span></div>
+                            <div class="tc-col"><span class="tc-lbl">Entry</span><span class="tc-val">${p.entryPrice.toFixed(dec)}</span></div>
+                            <div class="tc-col"><span class="tc-lbl">Live</span><span class="tc-val" id="prc-${p.id}">-</span></div>
+                        </div>
+                        <div class="tc-targets">
+                            <div><span class="tc-lbl">SL: </span><span class="tc-val" style="color:var(--color-sell)">${p.sl||'NONE'}</span> <span class="edit-icon" onclick="editTradeTarget(${p.id}, 'sl')">✎</span> <span class="be-btn" onclick="setBreakeven(${p.id})">BE</span></div>
+                            <div><span class="tc-lbl">TP: </span><span class="tc-val" style="color:var(--color-buy)">${p.tp||'NONE'}</span> <span class="edit-icon" onclick="editTradeTarget(${p.id}, 'tp')">✎</span></div>
+                        </div>
+                        <div class="action-group">
+                            <button class="action-btn half-btn" onclick="closeTrade(${p.id}, 'Manual', 0.5)">Close 50%</button>
+                            <button class="action-btn rev-btn" onclick="reversePosition(${p.id})">🔄 Reverse</button>
+                            <button class="action-btn" onclick="closeTrade(${p.id}, 'Manual', 1)">Close All</button>
+                        </div>
+                    </div>
+                    `}).join('');
+            }
+
+            let th = document.getElementById('tab-history');
+            if(historyData.length === 0) {
+                th.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:40px 10px; font-size:14px;">No Trade History</div>`;
+            } else {
+                th.innerHTML = historyData.map(h => {
+                    let dec = h.entry < 0.1 ? 6 : h.entry < 10 ? 4 : 2;
+                    let cardClass = h.type === 'LONG' ? 'long-card' : 'short-card';
+                    return `
+                    <div class="trade-card ${cardClass}" style="opacity: 0.8;">
+                        <div class="tc-header">
+                            <div class="tc-title">${h.asset} <span class="tc-lbl">${h.type}</span></div>
+                            <div class="tc-pnl" style="color:${h.pnl>=0?'var(--color-buy)':'var(--color-sell)'};">${h.pnl>=0?'+':''}$${h.pnl.toFixed(2)}</div>
+                        </div>
+                        <div class="tc-grid">
+                            <div class="tc-col"><span class="tc-lbl">Entry</span><span class="tc-val">${h.entry.toFixed(dec)}</span></div>
+                            <div class="tc-col"><span class="tc-lbl">Exit</span><span class="tc-val">${h.exit.toFixed(dec)}</span></div>
+                            <div class="tc-col" style="grid-column: span 2;"><span class="tc-lbl">Reason:</span><span style="color:var(--text-muted); font-size:11px;">${h.reason}</span></div>
+                        </div>
+                    </div>
+                    `}).join('');
+            }
+        }
+        function saveData() { localStorage.setItem('v6Balance', balance); localStorage.setItem('v6Positions', JSON.stringify(positions)); localStorage.setItem('v6History', JSON.stringify(historyData)); }
+    </script>
+</body>
+</html>
